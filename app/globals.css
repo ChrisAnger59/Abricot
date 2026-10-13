@@ -1,26 +1,49 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+
+  --color-primary: #D3590B;          /* orange from Logo, links, icons, IA button */
+  --color-primary-light: #FFE8D9;    /* pale orange : avatar, active span, profile logo */
+
+
+  --color-dark: #0F0F0F;             /* black button, active nav, titles */
+  --color-text: #1F1F1F;             /* main text */
+  --color-text-muted: #6B7280;       /* subtext, subtitles */
+  --color-page: #F9FAFB;             /* light grey background */
+  --color-surface: #FFFFFF;          /* cards, header, footer, sections */
+  --color-border: #E5E7EB;           /* main borders */
+  --color-border-kanban: #FFE0E0;    /* kanban sections borders */
+  --color-tag: #E5E7EB;              /* grey tags */
+
+ 
+  --color-todo-bg: #FFE0E0;
+  --color-todo-text: #EF4444;
+  --color-progress-bg: #FFF0D7;
+  --color-progress-text: #E08D00;
+  --color-done-bg: #F1FFF7;
+  --color-done-text: #27AE60;
+
+
+  --font-sans: var(--font-inter), sans-serif;        /* main texts */
+  --font-heading: var(--font-manrope), sans-serif;   /* titles */
+
+
+  --radius-card: 10px;
+  --radius-btn: 10px;
+
+
+  --shadow-header: 0 1px 4px rgb(0 0 0 / 0.04);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ===== Main Styles ===== */
+@layer base {
+  body {
+    background-color: var(--color-page);
+    color: var(--color-text);
+    font-family: var(--font-sans);
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  h1, h2, h3 {
+    font-family: var(--font-heading);
+  }
 }
