@@ -35,3 +35,9 @@ export interface AuthData {
 export interface ProfileData {
     user: User;
 }
+
+export interface AuthFormState {
+    message?: string;
+    fieldErrors?: Record<string, string>;
+    values?: Record<string, string>;
+}
