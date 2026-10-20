@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createSession } from "@/lib/session";
+import { createSession, deleteSession } from "@/lib/session";
 import type { ApiResponse, AuthData, AuthFormState } from "@/types/api";
 import { getString, validateRegister } from "@/lib/validation";
 
@@ -100,4 +100,10 @@ export async function register(_prevState: AuthFormState, formData: FormData): P
 
   await createSession(result.data.token);
   redirect("/account");
+}
+
+
+export async function logout() {
+  await deleteSession();
+  redirect("/login");
 }

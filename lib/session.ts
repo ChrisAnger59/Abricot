@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-const SESSION_COOKIE = "session_token";
+export const SESSION_COOKIE = "session_token";
 const SESSION_DURATION = 60 * 60 * 24 * 7; // 7 days
 
 export async function createSession(token: string) {
@@ -22,7 +22,7 @@ export async function getToken() {
     return cookie ? cookie.value : undefined;
 }
 
-export async function deleteSessions() {
+export async function deleteSession() {
     const cookieStore = await cookies();
     cookieStore.delete(SESSION_COOKIE);
 }
