@@ -1,16 +1,13 @@
-import { apiFetch } from "@/lib/api";
-import type { ProfileData } from "@/types/api";
+import { getCurrentUser } from "@/lib/user";
 
 export default async function AccountInfo() {
-    const result = await apiFetch<ProfileData>("/auth/profile");
+    const user = await getCurrentUser();
 
-    if (!result.success) {
+    if (!user) {
         return (
             <p>Impossible de récupérer vos informations</p>
         );
     }
-
-    const { user } = result.data;
 
     return (
         <div>
