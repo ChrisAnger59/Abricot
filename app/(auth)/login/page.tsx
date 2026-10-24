@@ -1,48 +1,25 @@
-"use client";
+import type { Metadata } from "next";
+import Link from "next/link";
+import Logo from "@/components/Atoms/Logo";
+import LoginForm from "@/components/Organisms/LoginForm";
 
-import { useActionState } from "react"
-import FormField from "@/components/Atoms/FormField";
-import { login } from "@/lib/actions/auth"
-import { AuthFormState } from "@/types/api";
+export const metadata: Metadata = {
+  title: "Connexion",
+};
 
-const initialState: AuthFormState = {};
+export default function LoginPage() {
+  return (
+    <div className="flex w-full max-w-sm flex-col gap-10 h-full justify-around">
+      <Logo size="large" />
 
-function Login() {
+      <LoginForm />
 
-    const [state, formAction, isPending] = useActionState(login, initialState);
-
-    return (
-        <form className="flex flex-col gap-5" action={formAction}>
-            <h1 className="text-center">Connexion</h1>
-
-            <FormField
-                id="email"
-                label="Email"
-                type="email"
-                name="email"
-                defaultValue={state.values?.email}
-                required
-            />
-
-            <FormField
-                id="password"
-                label="Mot de passe"
-                type="password"
-                name="password"
-                required
-            />
-
-            {state.message && (
-                <p className="text-sm text-todo-text">{state.message}</p>
-            )}
-
-            <button className="rounded-btn bg-dark text-surface p-4" disabled={isPending}>
-                {isPending ? "Connexion..." : "Se connecter"}
-            </button>
-
-            <a href="#">Mot de passe oublié</a>
-        </form>
-    );
+      <p className="text-sm">
+        Pas encore de compte ?{" "}
+        <Link href="/register" className="text-primary underline">
+          Créer un compte
+        </Link>
+      </p>
+    </div>
+  );
 }
-
-export default Login;
