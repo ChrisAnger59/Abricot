@@ -5,13 +5,22 @@ import type { ApiResponse } from "@/types/api";
 
 export async function apiFetch<T>(path: string): Promise<ApiResponse<T>> {
     const token = await getToken();
-    const response = await fetch(`${process.env.API_URL}${path}`, {
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-        }
-    });
+    let response: Response;
 
+    try {
+        response = await fetch(`${process.env.API_URL}${path}`, {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            }
+        });
+    } catch {
+        return {
+            success: false,
+            message: "Impossible de contacter le serveur",
+            error: "NETWORK_ERROR"
+        };
+    }
 
     if (response.status === 401) {
         redirect("/login?session=expired");
