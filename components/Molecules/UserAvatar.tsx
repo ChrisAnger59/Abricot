@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@/lib/user";
-import getInitials from "@/lib/utils";
+import { getInitials } from "@/lib/utils";
 import AvatarLink from "../Atoms/AvatarLink";
 
 export default async function UserAvatar() {
