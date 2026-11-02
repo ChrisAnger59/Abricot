@@ -2,25 +2,24 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Avatar from '@/components/Atoms/Avatar';
 
 interface AvatarLinkProps {
-    initials: string;
+    name: string;
 }
 
-export default function AvatarLink({ initials }: AvatarLinkProps) {
+export default function AvatarLink({ name }: AvatarLinkProps) {
     const pathname = usePathname();
     const isActive = pathname === "/account";
 
     return (
         <Link
             href="/account"
-            aria-label="Mon Compte"
+            aria-label="Mon compte"
             aria-current={isActive ? "page" : undefined}
-            className={`flex size-16 items-center justify-center rounded-full text-sm ${
-                isActive ? "bg-primary text-white" : "bg-primary-light text-dark"
-            }`}
+            className={`flex items-center justify-center rounded-full`}
         >
-            {initials}
+            <Avatar name={name} size="large" variant={isActive ? "active" : "highlighted"} />
         </Link>    
     )
 }

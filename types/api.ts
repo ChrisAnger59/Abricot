@@ -102,3 +102,46 @@ export interface AuthFormState {
     /** Message de confirmation, après une modification réussie */
     success?: string;
 }
+
+
+/** Rôle d'un utilisateur dans un projet */
+export type ProjectRole = "ADMIN" | "CONTRIBUTOR";
+
+/** Membre d'un projet : l'utilisateur est imbriqué dans user */
+export interface ProjectMember {
+    id: string;
+    role: ProjectRole;
+    joinedAt: string;
+    userId: string;
+    projectId: string;
+    user: User;
+}
+
+/**
+ * Projet tel que renvoyé par l'API.
+ * NOTE : l'équipe complète = owner + members (le propriétaire n'est pas automatiquement membre).
+ */
+export interface Project {
+    id: string;
+    name: string;
+    description: string | null;
+    createdAt: string;
+    updatedAt: string;
+    ownerId: string;
+    owner: User;
+    members: ProjectMember[];
+    _count: {
+        tasks: number;
+    };
+    userRole?: ProjectRole;
+}
+
+/** Contenu de data pour GET /projects */
+export interface ProjectsData {
+    projects: Project[]
+}
+
+/** Contenu de data pour POST /projects */
+export interface ProjectData {
+    project: Project;
+}
