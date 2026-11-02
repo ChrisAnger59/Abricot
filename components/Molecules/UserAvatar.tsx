@@ -1,12 +1,11 @@
 import { getCurrentUser } from "@/lib/user";
-import { getInitials } from "@/lib/utils";
-import AvatarLink from "../Atoms/AvatarLink";
+import AvatarLink from "@/components/Molecules/AvatarLink";
 
 export default async function UserAvatar() {
     const user = await getCurrentUser();
-    const initials = user ? getInitials(user.name) : "?";
+    const name = user ? user.name : "";
 
     return (
-        <AvatarLink initials={initials} />
+        <AvatarLink name={name} />
     );
 }
