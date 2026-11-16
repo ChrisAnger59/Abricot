@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import ProjectList from "@/components/Organisms/ProjectList";
+import CreateProjectForm from "@/components/Organisms/CreateProjectForm";
 
 function ProjectsPage() {
     return(
@@ -9,6 +10,8 @@ function ProjectsPage() {
             <Suspense fallback={<p>Chargement...</p>}>
                 <ProjectList />
             </Suspense>
+
+            <CreateProjectForm />
         </section>
     );
 }

@@ -143,3 +143,34 @@ export function validatePasswordChange(currentPassword: string, newPassword: str
 
     return errors;
 }
+
+
+/**
+ * Transforme le texte saisi dans le champ des contributeurs en tableau d'e-mails.
+ * Exemple : " alice@mail.com, bob@mail.com ,, " → ["alice@mail.com", "bob@mail.com"]
+ */
+export function parseEmails(raw: string): string[] {
+    return raw.split(",").map((email) => email.trim()).filter((email) => email !== "");
+}
+
+
+/**
+ * Vérifie les données du formulaire de création de projet.
+ *
+ * @returns Un objet d'erreurs indexé par nom de champ, vide si tout est valide.
+ */
+export function validateCreateProject(name: string, contributors: string[]): Record<string, string> {
+    const errors: Record<string, string> = {};
+
+    if(name === "") {
+        errors.name = "Le nom du projet est vide";
+    }
+
+    const invalidEmails = contributors.filter((email) => !EMAIL_REGEX.test(email));
+
+    if (invalidEmails.length > 0) {
+        errors.contributors = `Adresse e-mail invalide: ${invalidEmails.join(", ")}`;
+    }
+
+    return errors;
+}

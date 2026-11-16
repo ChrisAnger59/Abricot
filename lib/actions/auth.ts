@@ -18,35 +18,13 @@
 
 import { redirect } from "next/navigation";
 import { createSession, deleteSession } from "@/lib/session";
-import type { ApiResponse, AuthData, AuthFormState, ApiError, ProfileData } from "@/types/api";
+import type { ApiResponse, AuthData, AuthFormState, ProfileData } from "@/types/api";
 import { getString, validatePasswordChange, validateRegister, validateUpdateProfile } from "@/lib/validation";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, getFieldErrors } from "@/lib/api";
 import { refresh } from "next/cache";
 
 // Message affiché quand l'API ne répond pas, identique dans tous les formulaires
 const SERVER_ERROR_MESSAGE = "Impossible de contacter le serveur. Réessayez plus tard.";
-
-/**
- * Transforme les erreurs de validation renvoyées par l'API en objet indexé par nom de champs
- * 
- * L'API renvoie un tableau : [{ field: "email", message: "..." }, ...]
- * Le formulaire à besoin d'un objet : { email: "..." }
- * 
- * @param error - La réponse en erreur de l'API
- * @returns - les erreurs par champs, ou un objet vide si l'erreur n'en contient pas
- */
-function getFieldErrors(error: ApiError): Record<string, string> {
-  const fieldErrors: Record<string, string> = {};
-
-  if (error.data) {
-    for (const item of error.data.errors) {
-      fieldErrors[item.field] = item.message;
-    }
-  }
-
-  return fieldErrors;
-}
-
 
 /**
  * Connecte l'utilisateur
