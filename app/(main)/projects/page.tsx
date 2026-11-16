@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import ProjectList from "@/components/Organisms/ProjectList";
-import CreateProjectForm from "@/components/Organisms/CreateProjectForm";
+import CreateProjectButton from "@/components/Organisms/CreateProjectButton";
 
 function ProjectsPage() {
     return(
@@ -11,7 +11,7 @@ function ProjectsPage() {
                 <ProjectList />
             </Suspense>
 
-            <CreateProjectForm />
+            <CreateProjectButton />
         </section>
     );
 }
