@@ -3,6 +3,7 @@ import "server-only";
 
 import { redirect } from "next/navigation";
 import { getToken } from "@/lib/session";
+import { ApiError } from "@/types/api";
 import type { ApiResponse } from "@/types/api";
 
 /**
@@ -67,4 +68,26 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
     }
 
     return result;
+}
+
+
+/**
+ * Transforme les erreurs de validation renvoyées par l'API en objet indexé par nom de champs
+ * 
+ * L'API renvoie un tableau : [{ field: "email", message: "..." }, ...]
+ * Le formulaire à besoin d'un objet : { email: "..." }
+ * 
+ * @param error - La réponse en erreur de l'API
+ * @returns - les erreurs par champs, ou un objet vide si l'erreur n'en contient pas
+ */
+export function getFieldErrors(error: ApiError): Record<string, string> {
+  const fieldErrors: Record<string, string> = {};
+
+  if (error.data) {
+    for (const item of error.data.errors) {
+      fieldErrors[item.field] = item.message;
+    }
+  }
+
+  return fieldErrors;
 }
