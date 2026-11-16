@@ -1,14 +1,31 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import FormField from "@/components/Atoms/FormField";
-import type { AuthFormState, ProjectData } from "@/types/api";
+import type { AuthFormState } from "@/types/api";
 import { createProject } from "@/lib/actions/projects";
+
+
+interface CreateProjectFormProps {
+    // Called after succeded creation (ex: for closing the modale)
+    onSuccess?: () => void;
+}
 
 const initialState: AuthFormState = {};
 
-export default function CreateProjectForm() {
+
+/**
+ * Project Creation Form: name, description, contributors
+ * Contributors are entered in one input, with , between
+ */
+export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps) {
     const [state, formAction, isPending] = useActionState(createProject, initialState);
+
+    useEffect(() => {
+        if(state.success) {
+            onSuccess?.();
+        }
+    }, [state, onSuccess]);
 
     return (
         <form action={formAction} className="flex flex-col gap-6">
