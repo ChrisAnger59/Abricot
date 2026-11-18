@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import CreateProjectForm from "@/components/Organisms/CreateProjectForm";
+import Alert from "@/components/Atoms/Alert";
 
 /**
  * Bouton et modale contenant le formulaire de création
@@ -37,11 +38,9 @@ export default function CreateProjectButton() {
                 + Créer un projet
             </button>
 
-            {successMessage && (
-                <p role="status" className="text-sm text-done-text">
-                {successMessage}
-                </p>
-            )}
+            {successMessage && 
+                <Alert variant="success">{successMessage}</Alert>
+            }
 
             <dialog
                 ref={dialogRef}

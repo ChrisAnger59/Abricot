@@ -5,6 +5,7 @@ import FormField from "@/components/Atoms/FormField";
 import type { AuthFormState } from "@/types/api";
 import { createProject } from "@/lib/actions/projects";
 import ContributorsSelect from "@/components/Molecules/ContributorsSelect";
+import Alert from "@/components/Atoms/Alert";
 
 
 interface CreateProjectFormProps {
@@ -68,9 +69,9 @@ export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps)
 
             <ContributorsSelect error={state.fieldErrors?.contributors} />
 
-            {state.message && (
-                <p className="text-sm text-todo-text">{state.message}</p>
-            )}
+            {state.message &&
+                <Alert>{state.message}</Alert>
+            }
 
             <button
                 type="submit"

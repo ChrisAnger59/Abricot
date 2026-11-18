@@ -28,7 +28,7 @@ export const getCurrentUser = cache(async (): Promise<User | null> =>{
         // Erreurs visibles dans le terminal, jamais affiché à l'utilisateur
         // Renvoie null plutot que de lancer une erreur
         // Chaque composant décide de son affichage de repli, sans faire planter la page
-        console.error("Profil indeisponnible:", result.message);
+        console.error("Profil indisponnible:", result.message);
         return null;
     }
 

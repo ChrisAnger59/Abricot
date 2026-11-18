@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import FormField from "@/components/Atoms/FormField";
 import { updateUser } from "@/lib/actions/auth";
+import Alert from "@/components/Atoms/Alert";
 import type { AuthFormState, User } from "@/types/api";
 
 interface ProfileFormProps {
@@ -60,13 +61,9 @@ export default function UpdateUserForm({ user }: ProfileFormProps) {
                 error={state.fieldErrors?.newPassword}
             />
 
-            {state.message && (
-                <p className="text-sm text-todo-text">{state.message}</p>
-            )}
+            <Alert>{state.message}</Alert>
 
-            {state.success && (
-                <p role="status" className="text-sm text-done-text">{state.success}</p>
-            )}
+            <Alert variant="success">{state.success}</Alert>
 
             <button
                 type="submit"

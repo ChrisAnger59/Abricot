@@ -4,7 +4,9 @@ import { useActionState } from "react";
 import Link from "next/link";
 import FormField from "@/components/Atoms/FormField";
 import { login } from "@/lib/actions/auth";
+import Alert from "@/components/Atoms/Alert";
 import type { AuthFormState } from "@/types/api";
+
 
 const initialState: AuthFormState = {};
 
@@ -37,9 +39,9 @@ export default function LoginForm() {
           required
         />
 
-        {state.message && (
-          <p className="text-sm text-todo-text">{state.message}</p>
-        )}
+        {state.message &&
+          <Alert>{state.message}</Alert>
+        }
 
         <button
           type="submit"

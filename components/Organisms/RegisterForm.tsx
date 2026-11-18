@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { register } from "@/lib/actions/auth";
 import FormField from "@/components/Atoms/FormField";
+import Alert from "@/components/Atoms/Alert"
 import type { AuthFormState } from "@/types/api";
 
 const initialState: AuthFormState = {};
@@ -13,7 +14,7 @@ export default function RegisterForm() {
   return (
     
 
-    <form className="flex flex-col gap-5" action={formAction} noValidate>
+    <form className="flex flex-col gap-5" action={formAction}>
         <h1 className="text-center text-primary text-[xx-large] font-semibold">Inscription</h1>
 
         <FormField
@@ -44,6 +45,10 @@ export default function RegisterForm() {
             error={state.fieldErrors?.name}
             required
         />
+
+        {state.message &&
+            <Alert>{state.message}</Alert>
+        }
 
         <button className="rounded-btn bg-dark text-surface p-4" disabled={isPending}>
             {isPending ? "inscription..." : "S'Inscrire"}

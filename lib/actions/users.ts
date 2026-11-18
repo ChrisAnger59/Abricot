@@ -4,6 +4,13 @@ import { apiFetch } from "@/lib/api";
 import { getCurrentUser } from "@/lib/user";
 import type { User, UserData } from "@/types/api";
 
+// Result from searching users
+interface SearchUsersResult {
+    users: User[];
+    // Only if search has failed
+    error?: string;
+}
+
 // Minimal number of characters before any search
 const MIN_SEARCH_LENGTH = 3;
 
@@ -20,12 +27,12 @@ const MIN_SEARCH_LENGTH = 3;
  * @param query - searched cleanQuery
  * @returns Found Users or empty array
  */
-export async function searchUsers(query: string): Promise<User[]> {
+export async function searchUsers(query: string): Promise<SearchUsersResult> {
     const cleanQuery = query.trim();
 
     // Rule also checked by back end 
     if (cleanQuery.length < MIN_SEARCH_LENGTH) {
-        return [];
+        return { users: [] };
     }
 
     // URLSearchparams converts cleanQuery (spaces, special character, etc)
@@ -34,10 +41,12 @@ export async function searchUsers(query: string): Promise<User[]> {
 
     // As a research, an error does not block: no result
     if (!result.success) {
-        return [];
+        return { users: [], error: result.message };
     }
 
     const currentUser = await getCurrentUser();
 
-    return result.data.users.filter((user) => user.id !== currentUser?.id);
+    return {
+        users: result.data.users.filter((user) => user.id !== currentUser?.id)
+    };
 }
