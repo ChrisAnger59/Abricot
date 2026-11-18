@@ -27,9 +27,9 @@ export default function UpdateUserForm({ user }: ProfileFormProps) {
                 type="text"
                 name="name"
                 autoComplete="name"
-                placeholder={user.name}
-                defaultValue={state.values?.name}
+                defaultValue={state.values?.name ?? user.name}
                 error={state.fieldErrors?.name}
+                required
             />
 
             <FormField
@@ -38,9 +38,9 @@ export default function UpdateUserForm({ user }: ProfileFormProps) {
                 type="email"
                 name="email"
                 autoComplete="email"
-                placeholder={user.email}
-                defaultValue={state.values?.email}
+                defaultValue={state.values?.email ?? user.email}
                 error={state.fieldErrors?.email}
+                required
             />
 
             <FormField
@@ -61,9 +61,13 @@ export default function UpdateUserForm({ user }: ProfileFormProps) {
                 error={state.fieldErrors?.newPassword}
             />
 
-            <Alert>{state.message}</Alert>
+            {state.message &&
+                <Alert>{state.message}</Alert>
+            }
 
-            <Alert variant="success">{state.success}</Alert>
+            {state.success &&
+                <Alert variant="success">{state.success}</Alert>
+            }
 
             <button
                 type="submit"
