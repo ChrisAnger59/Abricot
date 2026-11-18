@@ -145,3 +145,8 @@ export interface ProjectsData {
 export interface ProjectData {
     project: Project;
 }
+
+/** Contenu de data pour GET users/search */
+export interface UserData {
+    users: User[];
+}

@@ -7,11 +7,10 @@ function ProjectsPage() {
         <section>
             <h1>Mes projets</h1>
             <p>Gérer vos projets</p>
+            <CreateProjectButton />
             <Suspense fallback={<p>Chargement...</p>}>
                 <ProjectList />
             </Suspense>
-
-            <CreateProjectButton />
         </section>
     );
 }
