@@ -14,32 +14,50 @@ export default function CreateProjectButton() {
 
     const [formKey, setFormKey] = useState(0);
 
+    const [successMessage, setSuccessMessage] = useState("");
+
     function openModale() {
+        setSuccessMessage("");
         setFormKey(formKey + 1);
         dialogRef.current?.showModal();
     }
 
+    function handleSuccess(message: string) {
+        dialogRef.current?.close();
+        setSuccessMessage(message);
+    }
+
     return (
-        <>
-            <button 
-            type="button" 
-            className="rounded-btn bg-dark p-4 text-surface"
-            onClick={openModale}
+        <div className="flex flex-col items-start gap-2">
+            <button
+                type="button"
+                onClick={openModale}
+                className="rounded-btn bg-dark px-6 py-3 text-sm text-white"
             >
                 + Créer un projet
             </button>
 
-            <dialog ref={dialogRef} className="m-auto w-full max-w-lg rounded-card bg-surface p-8 backdrop:bg-black/50">
-                <button 
-                    type="button"
-                    onClick={() => dialogRef.current?.close()}
-                    aria-label="Fermer"
-                    className="absolute top-4 right-4 text-2xl leading-none text-text-muted hover:text-text"
+            {successMessage && (
+                <p role="status" className="text-sm text-done-text">
+                {successMessage}
+                </p>
+            )}
+
+            <dialog
+                ref={dialogRef}
+                className="m-auto w-full max-w-lg rounded-card bg-surface p-8 backdrop:bg-black/50"
+            >
+                <button
+                type="button"
+                onClick={() => dialogRef.current?.close()}
+                aria-label="Fermer"
+                className="absolute top-4 right-4 text-2xl leading-none text-text-muted hover:text-text"
                 >
-                    x
+                ×
                 </button>
-                <CreateProjectForm key={formKey} onSuccess={() => dialogRef.current?.close()}/>
+
+                <CreateProjectForm key={formKey} onSuccess={handleSuccess} />
             </dialog>
-        </>
+        </div>
     );
 }

@@ -18,15 +18,16 @@ import type { AuthFormState, ProjectData } from "@/types/api";
  * @returns Les erreurs ou la confirmation à afficher, et les valeurs à réafficher
  */
 export async function createProject(_prevState: AuthFormState, formData: FormData): Promise<AuthFormState> {
+
     const name = getString(formData, "name");
     const description = getString(formData, "description");
-    const contributorsRaw = getString(formData, "contributors");
+    // hidden "contributors" field  
+    const contributors = formData.getAll("contributors").filter((value): value is string => typeof value === "string");
 
-    const contributors = parseEmails(contributorsRaw);
-    const values = { name, description, contributors: contributorsRaw };
+    const values = { name, description };
 
-    // Validation locale : si un champ est invalide, l'API n'est pas appelée
-    const fieldErrors = validateCreateProject(name, contributors);
+    // Front validation: if invalid field, API not called
+    const fieldErrors = validateCreateProject(name, description, contributors)
 
     if (Object.keys(fieldErrors).length > 0) {
         return { fieldErrors, values };
@@ -34,13 +35,7 @@ export async function createProject(_prevState: AuthFormState, formData: FormDat
 
     const result = await apiFetch<ProjectData>("/projects", {
         method: "POST",
-        body: JSON.stringify({
-            name,
-
-            // Une description vide n'est pas envoyée (champ facultatif pour l'API)
-            description: description || undefined,
-            contributors
-        })
+        body: JSON.stringify({ name, description, contributors }),
     });
 
     if (!result.success) {
@@ -51,10 +46,7 @@ export async function createProject(_prevState: AuthFormState, formData: FormDat
         };
     }
 
-    // La liste des projets de la page sera récupérée à nouveau, avec le nouveau projet
     refresh();
 
-    return {
-        success: "Projet créé avec succès"
-    };
+    return { success: "Projet créé avec succès !"};
 }
