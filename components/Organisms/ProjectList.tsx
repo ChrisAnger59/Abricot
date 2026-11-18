@@ -1,5 +1,6 @@
 import { apiFetch } from "@/lib/api";
-import ProjectCard from "../Molecules/ProjectCard";
+import ProjectCard from "@/components/Molecules/ProjectCard";
+import Alert from "@/components/Atoms/Alert";
 import type { ProjectsData } from "@/types/api";
 
 export default async function ProjectList() {
@@ -8,7 +9,7 @@ export default async function ProjectList() {
 
     if(!result.success) {
         return (
-            <p>Impossible de récupérer vos projets. Réessayez plus tard.</p>
+            <Alert>Impossible de récupérer vos projets. Réessayez plus tard.</Alert>
         );
     }
 

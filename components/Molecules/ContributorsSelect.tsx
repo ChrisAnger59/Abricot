@@ -4,6 +4,7 @@ import { useDebouncedCallback } from "use-debounce";
 import { useState } from "react";
 import type { User } from "@/types/api";
 import { searchUsers } from "@/lib/actions/users";
+import Alert from "@/components/Atoms/Alert";
 
 // Delay after last input (in milliseconds)
 const SEARCH_DELAY = 300;
@@ -21,17 +22,20 @@ export default function ContributorsSelect({ error }: ContributorsSelectProps) {
     const [results, setResults] = useState<User[]>([]);
     const [hasSearched, setHasSearched] = useState(false);
     const [selected, setSelected] = useState<User[]>([]);
+    const [searchError, setSearchError] = useState("");
 
     const handleSearch = useDebouncedCallback(async (query: string) => {
         // No API call before 3 characters
         if (query.trim().length < 3) {
             setResults([]);
             setHasSearched(false);
+            setSearchError("");
             return;
         }
 
-        const users = await searchUsers(query);
+        const { users, error } = await searchUsers(query);
         setResults(users);
+        setSearchError(error ?? "");
         setHasSearched(true);
 
     }, SEARCH_DELAY);
@@ -114,7 +118,11 @@ export default function ContributorsSelect({ error }: ContributorsSelectProps) {
                 </ul>
             )}
 
-            {hasSearched && results.length === 0 && (
+            {searchError && 
+                <Alert>{searchError}</Alert>
+            }
+
+            {hasSearched && !searchError && results.length === 0 && (
                 <p className="text-sm text-text-muted">Aucun utilisateur trouvé.</p>
             )}
 
