@@ -90,12 +90,14 @@ export function validateUpdateProfile(email: string, name: string): Record<strin
 
     const errors: Record<string, string> = {};
 
-    if (name !== "" && name.length < 2) {
-        errors.name = "Le nom doit contenir au moins 2 caractères"; 
+    if (name.length < 2) {
+        errors.name = "Le nom doit contenir au moins 2 caractères."
     }
 
-    if (email !== "" && !EMAIL_REGEX.test(email)) {
-        errors.email = "Format d'email invalide";
+    if (email === "") {
+        errors.email = "L'email ne peut pas être vide."
+    } else if (!EMAIL_REGEX.test(email)) {
+        errors.email = "Format d'email invalide."
     }
 
     return errors;

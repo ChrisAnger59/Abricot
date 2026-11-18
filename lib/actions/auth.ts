@@ -22,6 +22,7 @@ import type { ApiResponse, AuthData, AuthFormState, ProfileData } from "@/types/
 import { getString, validatePasswordChange, validateRegister, validateUpdateProfile } from "@/lib/validation";
 import { apiFetch, getFieldErrors } from "@/lib/api";
 import { refresh } from "next/cache";
+import { getCurrentUser } from "../user";
 
 // Message affiché quand l'API ne répond pas, identique dans tous les formulaires
 const SERVER_ERROR_MESSAGE = "Impossible de contacter le serveur. Réessayez plus tard.";
@@ -182,18 +183,10 @@ export async function updateUser(_prevState: AuthFormState, formData: FormData):
     return { fieldErrors, values: { email, name } };
   }
 
-  // Seuls les champs remplis sont envoyés : un champ vide signifie « pas de changement »
-  const profileChanges: { name?: string; email?: string } = {};
-
-  if (name !== "") {
-    profileChanges.name = name;
-  }
-
-  if (email !== "") {
-    profileChanges.email = email;
-  }
-
-  const wantsProfileChange = Object.keys(profileChanges).length > 0;
+  // FormFields always have user values
+  // Compare with the current values to make an API call only when necessary
+  const currentUser = await getCurrentUser();
+  const wantsProfileChange = name !== currentUser?.name || email !== currentUser?.email;
 
   // Après la validation, un mot de passe actuel renseigné signifie
   // que les deux champs le sont : l'utilisateur veut changer son mot de passe
@@ -224,11 +217,11 @@ export async function updateUser(_prevState: AuthFormState, formData: FormData):
     }
   }
 
-  // 2. Le profil, seulement si au moins un champ a été rempli
+  // 2. Profile, only if the name or email changed
   if (wantsProfileChange) {
     const profileResult = await apiFetch<ProfileData>("/auth/profile", {
       method: "PUT",
-      body: JSON.stringify(profileChanges),
+      body: JSON.stringify({ name, email }),
     });
 
     if (!profileResult.success) {
@@ -243,7 +236,7 @@ export async function updateUser(_prevState: AuthFormState, formData: FormData):
     }
   }
 
-  // Récupère à nouveau les données de la page : les placeholders du formulaire
+  // Récupère à nouveau les données de la page : les valeurs du formulaire
   // et l'avatar du header affichent ainsi les nouvelles valeurs
   refresh();
 
