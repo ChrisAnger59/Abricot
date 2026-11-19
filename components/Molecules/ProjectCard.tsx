@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Project } from "@/types/api";
 import Avatar from '@/components/Atoms/Avatar';
+import ProgressBar from "@/components/Atoms/ProgressBar";
 
 interface ProjectCardProps {
     project: Project;
@@ -27,7 +28,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
     return (
         <article className="flex h-full flex-col gap-6 rounded-card border border-border bg-surface p-6">
             <div className="flex flex-col gap-2">
-                <h2 className="text-lg">
+                <h2 className="font-heading text-lg font-semibold text-black">
                 <Link href={`/projects/${project.id}`} className="hover:text-primary">
                     {project.name}
                 </Link>
@@ -37,9 +38,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 </p>
             </div>
 
-            <p className="text-xs text-text-muted">
-                {taskCount} {taskCount > 1 ? "tâches" : "tâche"}
-            </p>
+            <ProgressBar done={0} total={project._count.tasks} />
 
             <div className="mt-auto flex flex-col gap-2">
                 <p className="text-xs text-text-muted">Équipe ({teamSize})</p>
