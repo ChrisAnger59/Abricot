@@ -4,14 +4,18 @@ import CreateProjectButton from "@/components/Organisms/CreateProjectButton";
 
 function ProjectsPage() {
     return(
-        <section>
-            <h1>Mes projets</h1>
-            <p>Gérer vos projets</p>
-            <CreateProjectButton />
+        <>
+            <div className="flex flex-row justify-between pb-16">
+                <div className="flex flex-col gap-3">
+                    <h1 className="font-heading text-2xl font-semibold text-text">Mes projets</h1>
+                    <p className="text-lg font-normal text-black">Gérer vos projets</p>
+                </div>
+                <CreateProjectButton />
+            </div>
             <Suspense fallback={<p>Chargement...</p>}>
                 <ProjectList />
             </Suspense>
-        </section>
+        </>
     );
 }
 

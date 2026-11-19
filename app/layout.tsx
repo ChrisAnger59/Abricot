@@ -23,7 +23,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="fr"
       className={`${inter.variable} ${manrope.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col max-w-360 mx-auto w-full">{children}</body>
+      <body className="min-h-full flex flex-col mx-auto w-full">{children}</body>
     </html>
   );
 }
