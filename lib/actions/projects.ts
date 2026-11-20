@@ -2,7 +2,7 @@
 
 import { refresh } from "next/cache";
 import { apiFetch, getFieldErrors } from "@/lib/api";
-import { getString, parseEmails, validateCreateProject } from "@/lib/validation";
+import { getString, validateCreateProject } from "@/lib/validation";
 import type { AuthFormState, ProjectData } from "@/types/api";
 
 
