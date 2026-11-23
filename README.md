@@ -57,6 +57,8 @@ Main choices:
 - Sign up, sign in, edit profile
 - Project list and project creation
 - Project page: contributors, task cards (description, due date, assignees, comment count) sorted by priority
+- Task creation in a modal (title, description, due date, assignees, status), with validation in the Server Action
+- Generic `Modal` component built on the native `<dialog>` element (used for projects and tasks)
 
 ## Accessibility
 

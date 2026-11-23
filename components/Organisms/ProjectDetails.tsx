@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { apiFetch } from "@/lib/api";
+import { getTeamUsers } from "@/lib/utils";
+import CreateTaskModal from "@/components/Modales/CreateTaskModal";
 import Alert from "@/components/Atoms/Alert";
 import ArrowLeftIcon from "@/components/Atoms/ArrowLeftIcon";
 import ProjectContributors from "@/components/Molecules/ProjectContributors";
@@ -37,19 +39,27 @@ export default async function ProjectDetails({ params }: ProjectDetailsProps) {
 
     return (
         <div className="flex flex-col gap-8">
-            <section className="flex items-start gap-4">
-                <Link
-                    href="/projects"
-                    aria-label="Retour aux projets"
-                    className="flex size-11 shrink-0 items-center justify-center rounded-btn border border-border bg-surface text-text hover:bg-section"
-                >
-                    <ArrowLeftIcon className="size-5" />
-                </Link>
+            <section className="flex flex-wrap items-start justify-between gap-4">
+                <div className="flex items-start gap-4">
+                    <Link
+                        href="/projects"
+                        aria-label="Retour aux projets"
+                        className="flex size-11 shrink-0 items-center justify-center rounded-btn border border-border bg-surface text-text hover:bg-section"
+                    >
+                        <ArrowLeftIcon className="size-5" />
+                    </Link>
 
-                <div className="flex flex-col gap-2">
-                    <h1 className="font-heading text-2xl font-semibold text-text">{project.name}</h1>
-                    <p className="text-text-muted">{project.description ?? "Aucune description"}</p>
+                    <div className="flex flex-col gap-2">
+                        <h1 className="font-heading text-2xl font-semibold text-text">{project.name}</h1>
+                        <p className="text-text-muted">{project.description ?? "Aucune description"}</p>
+                    </div>
                 </div>
+
+                {/* Only id and name go to the client component: no need to send e-mails to the browser */}
+                <CreateTaskModal
+                    projectId={project.id}
+                    users={getTeamUsers(project).map((user) => ({ id: user.id, name: user.name }))}
+                />
             </section>
 
             <ProjectContributors project={project} />

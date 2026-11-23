@@ -1,51 +1,51 @@
 "use server";
-// Chaque fonction exportée devient appelable depuis le navigateur (via attribut "action=" d'un formulaire)
-// Mais s'execute uniquement sur le serveur
+// Every exported function becomes callable from the browser (through the "action=" attribute of a form)
+// But it only runs on the server
 
 /**
- * Server Actions d'authentification (connexion, inscription, deconnexion)
- * 
- * login et register appellent l'API avec fetch et pas apiFetch
- * l'utilisateur n'a pas encore de token
- * une erreur 401 => "identifiants incorrects" et pas "session expirée"
- * 
- * Les erreurs attendues (identifiants incorrects, email déjà utilisé, etc...)
- * Sont renvoyées au formulaire, pas lancé avec throw
- * useActionState en fait l'état du formulaire, qui les affiche sans quitter la page
- * 
+ * Authentication Server Actions (login, register, logout)
+ *
+ * login and register call the API with fetch and not apiFetch:
+ * the user does not have a token yet,
+ * and a 401 error means "wrong credentials", not "session expired".
+ *
+ * Expected errors (wrong credentials, e-mail already used, etc.)
+ * are returned to the form, not thrown:
+ * useActionState makes them the form state, which displays them without leaving the page.
  */
 
 
 import { redirect } from "next/navigation";
 import { createSession, deleteSession } from "@/lib/session";
-import type { ApiResponse, AuthData, AuthFormState, ProfileData } from "@/types/api";
+import type { ApiResponse, AuthData, FormState, ProfileData } from "@/types/api";
 import { getString, validatePasswordChange, validateRegister, validateUpdateProfile } from "@/lib/validation";
 import { apiFetch, getFieldErrors } from "@/lib/api";
 import { refresh } from "next/cache";
 import { getCurrentUser } from "../user";
 
-// Message affiché quand l'API ne répond pas, identique dans tous les formulaires
+// Message displayed when the API does not answer, the same in every form
 const SERVER_ERROR_MESSAGE = "Impossible de contacter le serveur. Réessayez plus tard.";
 
 /**
- * Connecte l'utilisateur
- * 
- * Appelée par useActionState dans loginForm, qui fournit l'état précédent "{}", puis les données du formulaire.
- * 
- * Succès = enregistre le token dans le cookie de session, puis redirige
- * Echec = renvoie le message d'erreur et l'email saisi (mdp volontairement vidé)
- * 
- * Pas de validation de champs, le navigateur vérifie le format (required, type="password")
- * et l'API renvoie volontairement un message unique pour un email inconnu ou un mdp érroné afin de ne pas révéler quels comptes existent
- * 
- * @param _prevState - Etat précédent du formulaire, imposé par useActionState (non utilisé)
- * @param formData - Données envoyées par le formulaire
+ * Logs the user in.
+ *
+ * Called by useActionState in loginForm, which provides the previous state "{}", then the form data.
+ *
+ * Success = stores the token in the session cookie, then redirects
+ * Failure = returns the error message and the entered e-mail (password deliberately emptied)
+ *
+ * No field validation: the browser checks the format (required, type="password")
+ * and the API deliberately returns a single message for an unknown e-mail or a wrong password,
+ * so as not to reveal which accounts exist.
+ *
+ * @param _prevState - Previous state of the form, required by useActionState (unused)
+ * @param formData - Data sent by the form
  */
-export async function login(_prevState: AuthFormState, formData: FormData): Promise<AuthFormState> {
+export async function login(_prevState: FormState, formData: FormData): Promise<FormState> {
   const email = getString(formData, "email");
   const password = getString(formData, "password");
 
-  // Déclaré avant le try pour rester accessible après le bloc
+  // Declared before the try to stay accessible after the block
   let result: ApiResponse<AuthData>;
 
   try {
@@ -61,8 +61,8 @@ export async function login(_prevState: AuthFormState, formData: FormData): Prom
 
   } catch {
 
-    // fetch n'échoue que si l'API ne répond pas
-    // Une réponse 401 n'est pas une erreur pour fetch, elle est traitée plus bas
+    // fetch only fails if the API does not answer
+    // A 401 response is not an error for fetch, it is handled below
     return {
       message: SERVER_ERROR_MESSAGE,
       values: { email }
@@ -70,9 +70,9 @@ export async function login(_prevState: AuthFormState, formData: FormData): Prom
 
   }
 
-  // Grâce au test de success, TypeScript sait ensuite que result est un succès
+  // Thanks to the success test, TypeScript then knows result is a success
   if (!result.success) {
-    return { 
+    return {
         message: result.message,
         values: { email: String(email)}
     };
@@ -81,27 +81,27 @@ export async function login(_prevState: AuthFormState, formData: FormData): Prom
 
   await createSession(result.data.token);
 
-  // Redirect déclenche une erreur spéciale que le catch intercepterait
+  // Redirect throws a special error that the catch would intercept
   redirect("/account");
 }
 
 
 /**
- * Inscrit un nouvel utilisateur et le connecte (l'API renvoie un token dès inscription valide)
- * 
- * Les données sont validées avant l'appel à l'API pour éviteer une requête inutile
- * Les erreurs de champs (détéctées ici ou par l'API) sont affichées sous les champs concernés
- * 
- * @param _prevState - Etat précédent du formulaire, imposé par useActionState (non utilisé ici)
- * @param formData - Données envoyées par le formulaire
+ * Registers a new user and logs them in (the API returns a token as soon as the registration is valid).
+ *
+ * The data is validated before calling the API to avoid a useless request.
+ * Field errors (detected here or by the API) are displayed under the fields concerned.
+ *
+ * @param _prevState - Previous state of the form, required by useActionState (unused here)
+ * @param formData - Data sent by the form
  */
-export async function register(_prevState: AuthFormState, formData: FormData): Promise<AuthFormState> {
+export async function register(_prevState: FormState, formData: FormData): Promise<FormState> {
 
   const email = getString(formData, "email");
   const password = getString(formData, "password", false);
   const name = getString(formData, "name");
 
-  // Validation locale : si un champ est invalide, l'API n'est pas appelée
+  // Local validation: if a field is invalid, the API is not called
   const fieldErrors = validateRegister(email, password, name);
 
   if (Object.keys(fieldErrors).length > 0) {
@@ -129,7 +129,7 @@ export async function register(_prevState: AuthFormState, formData: FormData): P
 
     return {
       message: SERVER_ERROR_MESSAGE,
-      values: { email, name } 
+      values: { email, name }
     };
 
   }
@@ -147,33 +147,33 @@ export async function register(_prevState: AuthFormState, formData: FormData): P
 }
 
 /**
- * Met à jour le profil (nom, e-mail) et/ou le mot de passe de l'utilisateur connecté.
+ * Updates the profile (name, e-mail) and/or the password of the logged-in user.
  *
- * Un champ laissé vide signifie « pas de changement » : seuls les champs remplis
- * sont validés et envoyés à l'API (qui accepte name et email comme facultatifs).
+ * An empty field means "no change": only the filled fields are validated and sent
+ * to the API (which accepts name and email as optional).
  *
- * Passe par apiFetch, car les deux routes sont protégées :
- * - le token est joint automatiquement (l'API identifie l'utilisateur grâce à lui) ;
- * - une panne réseau renvoie une réponse d'erreur (pas besoin de try / catch ici) ;
- * - un token invalide redirige vers /login.
+ * Goes through apiFetch, because both routes are protected:
+ * - the token is attached automatically (the API identifies the user thanks to it);
+ * - a network failure returns an error response (no need for try / catch here);
+ * - an invalid token redirects to /login.
  *
- * Toutes les données sont validées avant le moindre appel à l'API.
- * Les routes sont ensuite appelées dans cet ordre, seulement si nécessaire :
- * PUT /auth/password, puis PUT /auth/profile.
+ * All the data is validated before any call to the API.
+ * The routes are then called in this order, only if needed:
+ * PUT /auth/password, then PUT /auth/profile.
  *
- * NOTE : ces deux routes ne sont pas documentées dans le Swagger.
+ * NOTE: these two routes are not documented in the Swagger.
  *
- * @param _prevState - État précédent du formulaire, imposé par useActionState (non utilisé)
- * @param formData - Données envoyées par le formulaire
- * @returns Les erreurs ou la confirmation à afficher, et les valeurs à réafficher (jamais les mots de passe)
+ * @param _prevState - Previous state of the form, required by useActionState (unused)
+ * @param formData - Data sent by the form
+ * @returns The errors or the confirmation to display, and the values to display again (never the passwords)
  */
-export async function updateUser(_prevState: AuthFormState, formData: FormData): Promise<AuthFormState> {
+export async function updateUser(_prevState: FormState, formData: FormData): Promise<FormState> {
   const email = getString(formData, "email");
   const name = getString(formData, "name");
   const currentPassword = getString(formData, "currentPassword", false);
   const newPassword = getString(formData, "newPassword", false);
 
-  // Validation locale du profil et du mot de passe, réunies en un seul objet
+  // Local validation of the profile and the password, merged into a single object
   const fieldErrors = {
     ...validateUpdateProfile(email, name),
     ...validatePasswordChange(currentPassword, newPassword),
@@ -188,16 +188,16 @@ export async function updateUser(_prevState: AuthFormState, formData: FormData):
   const currentUser = await getCurrentUser();
   const wantsProfileChange = name !== currentUser?.name || email !== currentUser?.email;
 
-  // Après la validation, un mot de passe actuel renseigné signifie
-  // que les deux champs le sont : l'utilisateur veut changer son mot de passe
+  // After validation, a filled current password means
+  // that both fields are filled: the user wants to change their password
   const wantsPasswordChange = currentPassword !== "";
 
   if (!wantsProfileChange && !wantsPasswordChange) {
     return { message: "Aucune modification à enregistrer." };
   }
 
-  // 1. Le mot de passe en premier : l'erreur la plus fréquente (ancien mot de passe
-  //    incorrect) arrête tout avant qu'aucune modification ne soit enregistrée
+  // 1. The password first: the most frequent error (wrong old password)
+  //    stops everything before any change is saved
   if (wantsPasswordChange) {
     const passwordResult = await apiFetch<undefined>("/auth/password", {
       method: "PUT",
@@ -207,8 +207,8 @@ export async function updateUser(_prevState: AuthFormState, formData: FormData):
     if (!passwordResult.success) {
       const errors = getFieldErrors(passwordResult);
 
-      // L'API ne renvoie pas d'erreur par champ pour un ancien mot de passe incorrect :
-      // on place son message sous le champ concerné grâce à son code
+      // The API does not return a field error for a wrong old password:
+      // its message is placed under the field concerned thanks to its code
       if (passwordResult.error === "INVALID_CURRENT_PASSWORD") {
         errors.currentPassword = passwordResult.message;
       }
@@ -226,7 +226,7 @@ export async function updateUser(_prevState: AuthFormState, formData: FormData):
 
     if (!profileResult.success) {
       return {
-        // Si le mot de passe vient d'être modifié, l'utilisateur doit le savoir
+        // If the password has just been changed, the user must know
         message: wantsPasswordChange
           ? `Votre mot de passe a été modifié, mais pas vos informations : ${profileResult.message}`
           : profileResult.message,
@@ -236,8 +236,8 @@ export async function updateUser(_prevState: AuthFormState, formData: FormData):
     }
   }
 
-  // Récupère à nouveau les données de la page : les valeurs du formulaire
-  // et l'avatar du header affichent ainsi les nouvelles valeurs
+  // Fetches the page data again: the form values
+  // and the header avatar then display the new values
   refresh();
 
   return { success: "Vos modifications ont été enregistrées." };
@@ -245,10 +245,10 @@ export async function updateUser(_prevState: AuthFormState, formData: FormData):
 
 
 /**
- * Déconnecte l'utilisateur: supprime le cookie de session, puis redirige vers "/login"
- * 
- * Déclenché par un formulaire sans champs (LogOutButton)
- * L'envoie d'un formulaire étant natif en HTML, le bouton peut rester un composant serveur
+ * Logs the user out: deletes the session cookie, then redirects to "/login".
+ *
+ * Triggered by a form without fields (LogOutButton).
+ * Since submitting a form is native HTML, the button can stay a server component.
  */
 export async function logout() {
   await deleteSession();

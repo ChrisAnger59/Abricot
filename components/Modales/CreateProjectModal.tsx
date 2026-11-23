@@ -1,30 +1,25 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
+import Modal from "@/components/Modales/Modal";
 import CreateProjectForm from "@/components/Organisms/CreateProjectForm";
 import Alert from "@/components/Atoms/Alert";
 
 /**
- * Bouton et modale contenant le formulaire de création
- * La modale utilise l'élément natif <dialog>, ouvert avec showModal()
+ * Button and modal containing the project creation form.
+ * Owns the open/closed state and the confirmation message; the <dialog> itself is handled by Modal.
  */
-export default function CreateProjectButton() {
-
-    // Référence vers l'élément <dialog>, pour pouvoir appeler ses méthodes
-    const dialogRef = useRef<HTMLDialogElement>(null);
-
-    const [formKey, setFormKey] = useState(0);
-
+export default function CreateProjectModal() {
+    const [isOpen, setIsOpen] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
 
-    function openModale() {
+    function openModal() {
         setSuccessMessage("");
-        setFormKey(formKey + 1);
-        dialogRef.current?.showModal();
+        setIsOpen(true);
     }
 
     function handleSuccess(message: string) {
-        dialogRef.current?.close();
+        setIsOpen(false);
         setSuccessMessage(message);
     }
 
@@ -32,31 +27,19 @@ export default function CreateProjectButton() {
         <div className="flex flex-col items-start gap-2">
             <button
                 type="button"
-                onClick={openModale}
-                className="rounded-btn bg-dark px-6 py-3 text-sm text-white"
+                onClick={openModal}
+                className="min-h-11 rounded-btn bg-dark px-6 py-3 text-sm text-white"
             >
                 + Créer un projet
             </button>
 
-            {successMessage && 
+            {successMessage &&
                 <Alert variant="success">{successMessage}</Alert>
             }
 
-            <dialog
-                ref={dialogRef}
-                className="m-auto w-full max-w-lg rounded-card bg-surface p-8 backdrop:bg-black/50"
-            >
-                <button
-                type="button"
-                onClick={() => dialogRef.current?.close()}
-                aria-label="Fermer"
-                className="absolute top-4 right-4 text-2xl leading-none text-text-muted hover:text-text"
-                >
-                ×
-                </button>
-
-                <CreateProjectForm key={formKey} onSuccess={handleSuccess} />
-            </dialog>
+            <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Créer un nouveau projet">
+                <CreateProjectForm onSuccess={handleSuccess} />
+            </Modal>
         </div>
     );
 }

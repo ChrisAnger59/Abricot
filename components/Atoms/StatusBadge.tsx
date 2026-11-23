@@ -1,6 +1,7 @@
 import type { TaskStatus } from "@/types/api";
 
-const STATUS_STYLES: Record<TaskStatus, { label: string, className: string }> = {
+// Exported so that other components (StatusPicker) use the same labels and colors
+export const STATUS_STYLES: Record<TaskStatus, { label: string, className: string }> = {
     TODO: { label: "À faire", className: "bg-todo-bg text-todo-text" },
     IN_PROGRESS: { label: "En cours", className: "bg-progress-bg text-progress-text" },
     DONE: { label: "Terminée", className: "bg-done-bg text-done-text" },

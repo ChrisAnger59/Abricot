@@ -4,9 +4,9 @@ import { useActionState } from "react";
 import { register } from "@/lib/actions/auth";
 import FormField from "@/components/Atoms/FormField";
 import Alert from "@/components/Atoms/Alert"
-import type { AuthFormState } from "@/types/api";
+import type { FormState } from "@/types/api";
 
-const initialState: AuthFormState = {};
+const initialState: FormState = {};
 
 export default function RegisterForm() {
   const [state, formAction, isPending] = useActionState(register, initialState);

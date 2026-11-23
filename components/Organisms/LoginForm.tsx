@@ -5,10 +5,10 @@ import Link from "next/link";
 import FormField from "@/components/Atoms/FormField";
 import { login } from "@/lib/actions/auth";
 import Alert from "@/components/Atoms/Alert";
-import type { AuthFormState } from "@/types/api";
+import type { FormState } from "@/types/api";
 
 
-const initialState: AuthFormState = {};
+const initialState: FormState = {};
 
 export default function LoginForm() {
   const [state, formAction, isPending] = useActionState(login, initialState);
