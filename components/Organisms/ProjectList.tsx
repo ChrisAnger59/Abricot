@@ -17,7 +17,7 @@ export default async function ProjectList() {
 
     if (projects.length === 0) {
         return (
-            <p>Aucun projet pour l'instant. Créez votre premier projet !</p>
+            <p>Aucun projet pour l&apos;instant. Créez votre premier projet !</p>
         );
     }
 

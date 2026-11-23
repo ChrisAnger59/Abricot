@@ -1,9 +1,9 @@
-// Types décrivants les données échangées avec l'API
-// Créé à partir des réponses réelles de l'API (test Swagger et Postman)
+// Types describing the data exchanged with the API
+// Built from the real API responses (Swagger and Postman tests)
 
 /**
- * Utilisateur renvoyé par l'API
- * mdp jamais renvoyé.
+ * User returned by the API.
+ * The password is never returned.
  */
 export interface User {
     id: string;
@@ -14,8 +14,8 @@ export interface User {
 }
 
 /**
- * Erreur de validation portant sur un champ précis du formulaire
- * ex: { field: "email", message: "Format d'email invalide" }
+ * Validation error about one specific form field
+ * e.g. { field: "email", message: "Format d'email invalide" }
  */
 export interface FieldError {
     field: string;
@@ -23,11 +23,11 @@ export interface FieldError {
 }
 
 /**
- * Réponse réussie de l'API 
- * La structure est toujours la même, uniquement le contenu de "data" change selon la route
- * T représente la forme de data, précisé à chaque utilisation
- * 
- * @example - ApiSuccess<ProfileData> => data contient { user }
+ * Successful API response.
+ * The structure is always the same, only the content of "data" changes depending on the route.
+ * T is the shape of data, specified at each use.
+ *
+ * @example - ApiSuccess<ProfileData> => data contains { user }
  */
 export interface ApiSuccess<T> {
     success: true;
@@ -37,20 +37,20 @@ export interface ApiSuccess<T> {
 
 
 /**
- * Réponse échoué de l'API
- * Les erreurs de validations arrivent de l'API dans data.errors
+ * Failed API response.
+ * Validation errors come from the API in data.errors
  */
 export interface ApiError {
 
     success: false;
 
-    /** Message destiné à l'utilisateur (ex. : "Email ou mot de passe incorrect") */
+    /** Message meant for the user (e.g. "Email ou mot de passe incorrect") */
     message: string;
 
-    /** Code technique stable, à tester dans le code (ex. : "EMAIL_ALREADY_EXISTS") */
+    /** Stable technical code, to be tested in the code (e.g. "EMAIL_ALREADY_EXISTS") */
     error: string;
 
-    /** Présent uniquement pour les erreurs de validation (400) */
+    /** Only present for validation errors (400) */
     data?: {
         errors: FieldError[];
     }
@@ -58,14 +58,14 @@ export interface ApiError {
 
 
 /**
- * Réponses de l'API: Reussie ou échouée
- * Tester "result.success" permet à TypeScript de savoir dans quel cas on se trouve
+ * API responses: succeeded or failed.
+ * Testing "result.success" lets TypeScript know which case we are in.
  */
 export type ApiResponse<T> = ApiSuccess<T> | ApiError;
 
 
 /**
- * Contenu de data pour "POST /auth/login" et "POST auth/register"
+ * Content of data for "POST /auth/login" and "POST /auth/register"
  */
 export interface AuthData {
     user: User;
@@ -74,8 +74,8 @@ export interface AuthData {
 
 
 /**
- * Contenu de data pour "GET /auth/profile" et "PUT /auth/profile"
- * L'utilisateur se trouve dans data.user
+ * Content of data for "GET /auth/profile" and "PUT /auth/profile"
+ * The user is in data.user
  */
 export interface ProfileData {
     user: User;
@@ -83,31 +83,31 @@ export interface ProfileData {
 
 
 /**
- * Etat d'un formulaire d'authentification, géré par useActionSate
- * 
- * Ce que renvoient les Server Actions (login, register, ...) quand l'envoi échoue
- * et ce que le formulaire affiche. Vide ({}) au premier affichage
+ * State of a form, managed by useActionState.
+ *
+ * What the Server Actions (login, register, ...) return when the submission fails
+ * and what the form displays. Empty ({}) on first render.
  */
 export interface AuthFormState {
 
-    /** Erreur générale, non liée à un champ (ex. : identifiants incorrects, serveur injoignable) */
+    /** General error, not tied to a field (e.g. wrong credentials, unreachable server) */
     message?: string;
 
-    /** Erreurs par champ, indexées par nom de champ (ex. : { password: "..." }) */
+    /** Errors by field, indexed by field name (e.g. { password: "..." }) */
     fieldErrors?: Record<string, string>;
 
-    /** Valeurs saisies à réafficher après une erreur (jamais le mot de passe) */
+    /** Entered values to display again after an error (never the password) */
     values?: Record<string, string>;
 
-    /** Message de confirmation, après une modification réussie */
+    /** Confirmation message, after a successful update */
     success?: string;
 }
 
 
-/** Rôle d'un utilisateur dans un projet */
+/** Role of a user in a project */
 export type ProjectRole = "ADMIN" | "CONTRIBUTOR";
 
-/** Membre d'un projet : l'utilisateur est imbriqué dans user */
+/** Project member: the user is nested in user */
 export interface ProjectMember {
     id: string;
     role: ProjectRole;
@@ -118,8 +118,8 @@ export interface ProjectMember {
 }
 
 /**
- * Projet tel que renvoyé par l'API.
- * NOTE : l'équipe complète = owner + members (le propriétaire n'est pas automatiquement membre).
+ * Project as returned by the API.
+ * NOTE: the full team = owner + members (the owner is not automatically a member).
  */
 export interface Project {
     id: string;
@@ -136,17 +136,72 @@ export interface Project {
     userRole?: ProjectRole;
 }
 
-/** Contenu de data pour GET /projects */
+/** Content of data for GET /projects */
 export interface ProjectsData {
     projects: Project[]
 }
 
-/** Contenu de data pour POST /projects */
+/** Content of data for POST /projects and GET /projects/{id} */
 export interface ProjectData {
     project: Project;
 }
 
-/** Contenu de data pour GET users/search */
-export interface UserData {
+/** Content of data for GET /users/search */
+export interface UsersData {
     users: User[];
+}
+
+
+export type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE" | "CANCELLED";
+export type TaskPriority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+
+/** User assigned to a task */
+export interface TaskAssignee {
+    id: string;
+    assignedAt: string;
+    user: User;
+}
+
+/** Content of data for GET /projects/{id}/tasks */
+export interface TasksData {
+    tasks: Task[];
+}
+
+/**
+ * Full task, as returned by GET /projects/{id}/tasks.
+ * NOTE: dueDate is an ISO date at midnight UTC (e.g. "2026-12-08T00:00:00.000Z").
+ */
+export interface Task {
+    id: string;
+    title: string;
+    description: string | null;
+    status: TaskStatus;
+    priority: TaskPriority;
+    dueDate: string | null;
+    createdAt: string;
+    updatedAt: string;
+    projectId: string;
+    creatorId: string;
+    creator: User;
+    project: {
+        id: string;
+        name: string;
+    }
+    assignees: TaskAssignee[];
+    comments: TaskComment[];
+}
+
+/**
+ * Task comment.
+ * NOTE: built from the documentation (api-docs); no real comment observed yet,
+ * to be confirmed with a real call in the comments feature.
+ */
+export interface TaskComment {
+    id: string;
+    content: string;
+    taskId: string;
+    authorId: string;
+    author: User;
+    createdAt: string;
+    updatedAt: string;
 }

@@ -1,8 +1,8 @@
-async function ProjectDetailsPage({ params }:{ params: Promise<{id: string}>; }) {
-    const { id } = await params;
+import ProjectDetails from '@/components/Organisms/ProjectDetails';
+
+export default function ProjectPage({ params }:{ params: Promise<{id: string}>; }) {
+
     return (
-        <h1>Projet {id}</h1>
+        <ProjectDetails params={params} />
     );
 }
-
-export default ProjectDetailsPage;

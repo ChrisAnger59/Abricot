@@ -4,12 +4,15 @@
 
   --color-primary: #D3590B;          /* orange from Logo, links, icons, IA button */
   --color-primary-light: #FFE8D9;    /* pale orange : avatar, active span, profile logo */
+  --color-primary-text: #A84405;     /* orange for TEXT: 5.1:1 on primary-light, 6:1 on white (primary itself: 3.4:1 / 4.0:1) */
 
 
   --color-dark: #0F0F0F;             /* black button, active nav, titles */
   --color-text: #1F1F1F;             /* main text */
-  --color-text-muted: #6B7280;       /* subtext, subtitles */
+  --color-text-muted: #6B7280;       /* subtext, subtitles (4.8:1 on white only) */
+  --color-text-on-tint: #4B5563;     /* grey text on tinted backgrounds (section, tag): 6:1 on tag, 7:1 on section */
   --color-page: #F9FAFB;             /* light grey background */
+  --color-section: #F3F4F6;          /* lighter grey background */
   --color-surface: #FFFFFF;          /* cards, header, footer, sections */
   --color-border: #E5E7EB;           /* main borders */
   --color-border-kanban: #FFE0E0;    /* kanban sections borders */
@@ -17,11 +20,13 @@
 
  
   --color-todo-bg: #FFE0E0;
-  --color-todo-text: #EF4444;
+  /* Status text colors are darker than the mockup to reach the WCAG AA 4.5:1 ratio
+     (mockup values: #EF4444 = 3.0:1, #E08D00 = 2.3:1, #27AE60 = 2.8:1) */
+  --color-todo-text: #B91C1C;        /* 5.2:1 on todo-bg */
   --color-progress-bg: #FFF0D7;
-  --color-progress-text: #E08D00;
+  --color-progress-text: #8A5400;    /* 5.6:1 on progress-bg */
   --color-done-bg: #F1FFF7;
-  --color-done-text: #27AE60;
+  --color-done-text: #1E7E46;        /* 4.9:1 on done-bg */
 
 
   --font-sans: var(--font-inter), sans-serif;        /* main texts */
