@@ -2,7 +2,7 @@
 
 import { apiFetch } from "@/lib/api";
 import { getCurrentUser } from "@/lib/user";
-import type { User, UserData } from "@/types/api";
+import type { User, UsersData } from "@/types/api";
 
 // Result from searching users
 interface SearchUsersResult {
@@ -37,7 +37,7 @@ export async function searchUsers(query: string): Promise<SearchUsersResult> {
 
     // URLSearchparams converts cleanQuery (spaces, special character, etc)
     const params = new URLSearchParams({ query: cleanQuery });
-    const result = await apiFetch<UserData>(`/users/search?${params.toString()}`);
+    const result = await apiFetch<UsersData>(`/users/search?${params.toString()}`);
 
     // As a research, an error does not block: no result
     if (!result.success) {

@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { Project } from "@/types/api";
 import Avatar from '@/components/Atoms/Avatar';
 import ProgressBar from "@/components/Atoms/ProgressBar";
+import UserTag from "@/components/Molecules/UserTag";
+import { getOtherMembers } from "@/lib/utils";
 
 interface ProjectCardProps {
     project: Project;
@@ -18,9 +20,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 
     // Le propriétaire peut aussi figurer dans members (s'il s'est ajouté comme contributeur) :
     // on l'exclut pour ne pas le compter deux fois
-    const otherMembers = project.members.filter(
-        (member) => member.userId !== project.ownerId
-    );
+    const otherMembers = getOtherMembers(project);
 
     const teamSize = 1 + otherMembers.length;
     const taskCount = project._count.tasks;
@@ -38,16 +38,13 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 </p>
             </div>
 
-            <ProgressBar done={0} total={project._count.tasks} />
+            <ProgressBar done={0} total={taskCount} />
 
             <div className="mt-auto flex flex-col gap-2">
                 <p className="text-xs text-text-muted">Équipe ({teamSize})</p>
 
                 <div className="flex items-center gap-2">
-                    <Avatar name={project.owner.name} variant="highlighted" />
-                    <span className="rounded-full bg-primary-light px-3 py-0.5 text-xs text-primary">
-                    Propriétaire
-                    </span>
+                    <UserTag name={project.owner.name} label="Propriétaire" variant="highlighted" />
 
                     <div className="flex -space-x-1">
                         {otherMembers.map((member) => (
