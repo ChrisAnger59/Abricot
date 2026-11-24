@@ -3,25 +3,25 @@
 import { refresh } from "next/cache";
 import { apiFetch, getFieldErrors } from "@/lib/api";
 import { getString, validateCreateProject } from "@/lib/validation";
-import type { AuthFormState, ProjectData } from "@/types/api";
+import type { FormState, ProjectData } from "@/types/api";
 
 
 
 /**
- * Crée un projet, avec ses éventuels contributeurs.
+ * Creates a project, with its contributors.
  *
- * Les contributeurs sont saisis dans un seul champ, séparés par des virgules,
- * puis transformés en tableau d'e-mails (format attendu par l'API).
+ * Contributors are chosen in the form (one hidden "contributors" field per person)
+ * and sent to the API as an array of e-mails, the format it expects.
  *
- * @param _prevState - État précédent du formulaire, imposé par useActionState (non utilisé)
- * @param formData - Données envoyées par le formulaire
- * @returns Les erreurs ou la confirmation à afficher, et les valeurs à réafficher
+ * @param _prevState - Previous state of the form, required by useActionState (unused)
+ * @param formData - Data sent by the form
+ * @returns The errors or the confirmation to display, and the values to display again
  */
-export async function createProject(_prevState: AuthFormState, formData: FormData): Promise<AuthFormState> {
+export async function createProject(_prevState: FormState, formData: FormData): Promise<FormState> {
 
     const name = getString(formData, "name");
     const description = getString(formData, "description");
-    // hidden "contributors" field  
+    // hidden "contributors" field
     const contributors = formData.getAll("contributors").filter((value): value is string => typeof value === "string");
 
     const values = { name, description };

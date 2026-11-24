@@ -85,10 +85,10 @@ export interface ProfileData {
 /**
  * State of a form, managed by useActionState.
  *
- * What the Server Actions (login, register, ...) return when the submission fails
- * and what the form displays. Empty ({}) on first render.
+ * What the Server Actions (login, register, createProject, createTask, ...) return when
+ * the submission fails and what the form displays. Empty ({}) on first render.
  */
-export interface AuthFormState {
+export interface FormState {
 
     /** General error, not tied to a field (e.g. wrong credentials, unreachable server) */
     message?: string;
@@ -165,6 +165,11 @@ export interface TaskAssignee {
 /** Content of data for GET /projects/{id}/tasks */
 export interface TasksData {
     tasks: Task[];
+}
+
+/** Content of data for POST /projects/{id}/tasks and PUT /projects/{id}/tasks/{taskId} */
+export interface TaskData {
+    task: Task;
 }
 
 /**

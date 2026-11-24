@@ -4,13 +4,13 @@ import { useActionState } from "react";
 import FormField from "@/components/Atoms/FormField";
 import { updateUser } from "@/lib/actions/auth";
 import Alert from "@/components/Atoms/Alert";
-import type { AuthFormState, User } from "@/types/api";
+import type { FormState, User } from "@/types/api";
 
 interface ProfileFormProps {
     user: User;
 }
 
-const initialState: AuthFormState = {};
+const initialState: FormState = {};
 
 export default function UpdateUserForm({ user }: ProfileFormProps) {
     const [state, formAction, isPending] = useActionState(updateUser, initialState);

@@ -1,4 +1,4 @@
-import type { Project, ProjectMember, Task, TaskPriority } from "@/types/api";
+import type { Project, ProjectMember, Task, TaskPriority, User } from "@/types/api";
 
 /**
  * Computes the initials shown in an avatar.
@@ -46,6 +46,15 @@ export function getInitials(username: string): string {
  */
 export function getOtherMembers(project: Project): ProjectMember[] {
     return project.members.filter((member) => member.userId !== project.ownerId);
+}
+
+
+/**
+ * Returns the whole team of a project as plain users: the owner first, then the other members.
+ * Used to choose the people a task can be assigned to (the API accepts the owner as assignee).
+ */
+export function getTeamUsers(project: Project): User[] {
+    return [project.owner, ...getOtherMembers(project).map((member) => member.user)];
 }
 
 

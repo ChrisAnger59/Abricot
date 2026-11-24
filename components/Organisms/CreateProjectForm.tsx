@@ -2,23 +2,24 @@
 
 import { useActionState, useEffect } from "react";
 import FormField from "@/components/Atoms/FormField";
-import type { AuthFormState } from "@/types/api";
+import TextAreaField from "@/components/Atoms/TextAreaField";
+import type { FormState } from "@/types/api";
 import { createProject } from "@/lib/actions/projects";
 import ContributorsSelect from "@/components/Molecules/ContributorsSelect";
 import Alert from "@/components/Atoms/Alert";
 
 
 interface CreateProjectFormProps {
-    // Called after succeded creation (ex: for closing the modale)
+    // Called after a successful creation (e.g. to close the modal)
     onSuccess?: (message: string) => void;
 }
 
-const initialState: AuthFormState = {};
+const initialState: FormState = {};
 
 
 /**
- * Project Creation Form: name, description, contributors
- * Contributors are entered in one input, with , between
+ * Project creation form: name, description, contributors (chosen with a search field).
+ * The title is displayed by the Modal that contains this form.
  */
 export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps) {
     const [state, formAction, isPending] = useActionState(createProject, initialState);
@@ -29,12 +30,8 @@ export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps)
         }
     }, [state, onSuccess]);
 
-    const descriptionError = state.fieldErrors?.description;
-
     return (
         <form action={formAction} className="flex flex-col gap-6">
-            <h2 className="text-lg font-bold">Créer un nouveau projet</h2>
-
             <FormField
                 id="name"
                 label="Nom"
@@ -46,26 +43,15 @@ export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps)
                 error={state.fieldErrors?.name}
             />
 
-            <div className="flex flex-col gap-2">
-                <label htmlFor="description" className="text-sm">
-                Description
-                </label>
-                <textarea
+            <TextAreaField
                 id="description"
+                label="Description"
                 name="description"
                 rows={4}
                 placeholder="Décrivez le projet en quelques mots"
                 defaultValue={state.values?.description}
-                aria-invalid={descriptionError ? true : undefined}
-                aria-describedby={descriptionError ? "description-error" : undefined}
-                className="rounded-btn border border-border bg-surface px-4 py-3 text-sm text-text placeholder:text-text-muted"
-                />
-                {descriptionError && (
-                <p id="description-error" className="text-sm text-todo-text">
-                    {descriptionError}
-                </p>
-                )}
-            </div>
+                error={state.fieldErrors?.description}
+            />
 
             <ContributorsSelect error={state.fieldErrors?.contributors} />
 
@@ -76,7 +62,7 @@ export default function CreateProjectForm({ onSuccess }: CreateProjectFormProps)
             <button
                 type="submit"
                 disabled={isPending}
-                className="self-start rounded-btn bg-dark px-6 py-3 text-sm text-white disabled:opacity-50"
+                className="min-h-11 self-start rounded-btn bg-dark px-6 py-3 text-sm text-white disabled:opacity-50"
             >
                 {isPending ? "Création…" : "Créer le projet"}
             </button>
