@@ -39,7 +39,7 @@ Create `front-end/.env.local` (never committed):
 
 ```
 app/            routes: (auth) public pages, (main) pages for signed-in users
-components/     Atomic Design: Atoms, Molecules, Organisms, Modales
+components/     Atomic Design: Atoms, Molecules, Organisms, Modales (+ Providers for React contexts)
 lib/            session cookie, API client (apiFetch), validation, utils, Server Actions
 types/api.ts    types of the API responses, built from real responses
 proxy.ts        route protection
@@ -58,7 +58,9 @@ Main choices:
 - Project list and project creation
 - Project page: contributors, task cards (description, due date, assignees, comment count) sorted by priority
 - Task creation in a modal (title, description, due date, assignees, status), with validation in the Server Action
+- Task edition and deletion from a "…" menu on each task card (native Popover API), with a confirmation modal before deleting
 - Generic `Modal` component built on the native `<dialog>` element (used for projects and tasks)
+- Shared confirmation message (`FlashMessageProvider`): centered, dismissible and self-closing, announced to screen readers
 
 ## Accessibility
 

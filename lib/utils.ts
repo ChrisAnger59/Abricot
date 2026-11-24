@@ -95,3 +95,15 @@ export function formatDueDate(isoDate: string): string {
         timeZone: "UTC"
     }).format(new Date(isoDate));
 }
+
+
+/**
+ * Converts an ISO date to the YYYY-MM-DD text an <input type="date"> expects as its value,
+ * e.g. "2026-12-08T00:00:00.000Z" => "2026-12-08".
+ *
+ * NOTE: the API stores due dates at midnight UTC, so the first 10 characters are already the
+ * right day. Going through `new Date` would apply the local time zone and could give the day before.
+ */
+export function toDateInputValue(isoDate: string): string {
+    return isoDate.slice(0, 10);
+}

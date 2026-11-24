@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Alert from "@/components/Atoms/Alert";
 import Modal from "@/components/Modales/Modal";
-import CreateTaskForm from "@/components/Organisms/CreateTaskForm";
+import TaskForm from "@/components/Organisms/TaskForm";
+import { useFlashMessage } from "@/components/Providers/FlashMessageProvider";
+import { createTask } from "@/lib/actions/tasks";
 import type { User } from "@/types/api";
 
 interface CreateTaskModalProps {
@@ -13,40 +14,38 @@ interface CreateTaskModalProps {
 }
 
 /**
- * "Créer une tâche" button and the modal containing the task creation form.
- * Owns the open/closed state and the confirmation message; the <dialog> itself is handled by Modal.
- *
- * TODO: replace the confirmation Alert by the centered, dismissible and self-closing message
- * planned for project and task creation (progress and confirmation feature).
+ * "Créer une tâche" button and the modal containing the task form.
+ * Owns the open/closed state; the <dialog> itself is handled by Modal and the confirmation
+ * message by the shared FlashMessageProvider.
  */
 export default function CreateTaskModal({ projectId, users }: CreateTaskModalProps) {
     const [isOpen, setIsOpen] = useState(false);
-    const [successMessage, setSuccessMessage] = useState("");
-
-    function openModal() {
-        setSuccessMessage("");
-        setIsOpen(true);
-    }
+    const { showMessage } = useFlashMessage();
 
     function handleSuccess(message: string) {
         setIsOpen(false);
-        setSuccessMessage(message);
+        showMessage(message);
     }
 
     return (
-        <div className="flex flex-col items-start gap-2 sm:items-end">
+        <div>
             <button
                 type="button"
-                onClick={openModal}
+                onClick={() => setIsOpen(true)}
                 className="min-h-11 rounded-btn bg-dark px-6 py-3 text-sm text-white"
             >
                 Créer une tâche
             </button>
 
-            {successMessage && <Alert variant="success">{successMessage}</Alert>}
-
             <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Créer une tâche">
-                <CreateTaskForm projectId={projectId} users={users} onSuccess={handleSuccess} />
+                <TaskForm
+                    // bind pre-fills the project id: the form then only adds the previous state and the data
+                    action={createTask.bind(null, projectId)}
+                    users={users}
+                    submitLabel="+ Ajouter une tâche"
+                    pendingLabel="Création…"
+                    onSuccess={handleSuccess}
+                />
             </Modal>
         </div>
     );

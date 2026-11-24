@@ -37,6 +37,9 @@ export default async function ProjectDetails({ params }: ProjectDetailsProps) {
     // hence this second call for the full tasks
     const tasksResult = await apiFetch<TasksData>(`/projects/${id}/tasks`);
 
+    // Only id and name go to the client components: no need to send e-mails to the browser
+    const teamUsers = getTeamUsers(project).map((user) => ({ id: user.id, name: user.name }));
+
     return (
         <div className="flex flex-col gap-8">
             <section className="flex flex-wrap items-start justify-between gap-4">
@@ -55,18 +58,14 @@ export default async function ProjectDetails({ params }: ProjectDetailsProps) {
                     </div>
                 </div>
 
-                {/* Only id and name go to the client component: no need to send e-mails to the browser */}
-                <CreateTaskModal
-                    projectId={project.id}
-                    users={getTeamUsers(project).map((user) => ({ id: user.id, name: user.name }))}
-                />
+                <CreateTaskModal projectId={project.id} users={teamUsers} />
             </section>
 
             <ProjectContributors project={project} />
 
             {/* An error on the tasks does not prevent displaying the rest of the project */}
             {tasksResult.success ? (
-                <TaskList tasks={tasksResult.data.tasks} />
+                <TaskList tasks={tasksResult.data.tasks} users={teamUsers} />
             ) : (
                 <Alert>Impossible de récupérer les tâches de ce projet. Réessayez plus tard.</Alert>
             )}

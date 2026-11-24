@@ -1,35 +1,54 @@
 import StatusBadge from "@/components/Atoms/StatusBadge";
 import CalendarIcon from "@/components/Atoms/CalendarIcon";
+import TaskActions from "@/components/Molecules/TaskActions";
 import UserTag from "@/components/Molecules/UserTag";
 import { formatDueDate } from "@/lib/utils";
-import type { Task } from "@/types/api";
+import type { Task, User } from "@/types/api";
 
 interface TaskCardProps {
     task: Task;
+    // People a task can be assigned to (the team of the project), for the edit form
+    users: Pick<User, "id" | "name">[];
 }
 
 /**
  * Card of one task in the project page: title, status, description, due date,
- * assignees and number of comments.
+ * assignees and number of comments, plus the "…" menu to edit or delete it.
  *
- * Server component: nothing here is interactive yet (the actions menu and the
- * comments toggle come with their own features).
+ * Server component: only the menu (TaskActions) is a client component, since it is the only
+ * interactive part (the comments toggle comes with its own feature).
  * The title is an <h3>: h1 = project, h2 = "Tâches".
  */
-export default function TaskCard({ task }: TaskCardProps) {
+export default function TaskCard({ task, users }: TaskCardProps) {
     const commentCount = task.comments.length;
 
     return (
         <article className="flex flex-col gap-4 rounded-card border border-border bg-surface p-4 sm:p-6">
-            <div className="flex flex-col gap-2">
-                <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="font-heading text-base font-semibold text-text">{task.title}</h3>
-                    <StatusBadge status={task.status} />
+            <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-col gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="font-heading text-base font-semibold text-text">{task.title}</h3>
+                        <StatusBadge status={task.status} />
+                    </div>
+
+                    {task.description && (
+                        <p className="text-sm text-text-muted">{task.description}</p>
+                    )}
                 </div>
 
-                {task.description && (
-                    <p className="text-sm text-text-muted">{task.description}</p>
-                )}
+                {/* Only the data the edit form needs goes to the client component */}
+                <TaskActions
+                    projectId={task.projectId}
+                    taskId={task.id}
+                    task={{
+                        title: task.title,
+                        description: task.description,
+                        dueDate: task.dueDate,
+                        status: task.status,
+                        assigneeIds: task.assignees.map((assignee) => assignee.user.id),
+                    }}
+                    users={users}
+                />
             </div>
 
             <div className="flex flex-col gap-3 text-xs text-text-muted">
