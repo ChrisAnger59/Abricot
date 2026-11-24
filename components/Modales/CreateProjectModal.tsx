@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import Modal from "@/components/Modales/Modal";
-import CreateProjectForm from "@/components/Organisms/CreateProjectForm";
+import ProjectForm from "@/components/Organisms/ProjectForm";
 import { useFlashMessage } from "@/components/Providers/FlashMessageProvider";
+import { createProject } from "@/lib/actions/projects";
 
 /**
  * Button and modal containing the project creation form.
@@ -30,7 +31,12 @@ export default function CreateProjectModal() {
             </button>
 
             <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Créer un nouveau projet">
-                <CreateProjectForm onSuccess={handleSuccess} />
+                <ProjectForm
+                    action={createProject}
+                    submitLabel="Créer le projet"
+                    pendingLabel="Création…"
+                    onSuccess={handleSuccess}
+                />
             </Modal>
         </div>
     );

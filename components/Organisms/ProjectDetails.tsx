@@ -2,8 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { getCurrentUser } from "@/lib/user";
-import { getTeamUsers, parseTaskFilters, type SearchParams } from "@/lib/utils";
+import { getOtherMembers, getTeamUsers, parseTaskFilters, type SearchParams } from "@/lib/utils";
 import CreateTaskModal from "@/components/Modales/CreateTaskModal";
+import EditProjectModal from "@/components/Modales/EditProjectModal";
 import Alert from "@/components/Atoms/Alert";
 import ArrowLeftIcon from "@/components/Atoms/ArrowLeftIcon";
 import ProjectContributors from "@/components/Molecules/ProjectContributors";
@@ -62,7 +63,27 @@ export default async function ProjectDetails({ params, searchParams }: ProjectDe
                     </Link>
 
                     <div className="flex flex-col gap-2">
-                        <h1 className="font-heading text-2xl font-semibold text-text">{project.name}</h1>
+                        <div className="flex flex-wrap items-center gap-x-3">
+                            <h1 className="font-heading text-2xl font-semibold text-text">{project.name}</h1>
+
+                            {/* Only the administrators (owner included) can edit: userRole comes from the API.
+                                This only hides the button, the API refuses the change to anyone else (403).
+                                Only id, name and e-mail of the contributors go to the browser. */}
+                            {project.userRole === "ADMIN" && (
+                                <EditProjectModal
+                                    projectId={project.id}
+                                    project={{
+                                        name: project.name,
+                                        description: project.description,
+                                        contributors: getOtherMembers(project).map((member) => ({
+                                            id: member.user.id,
+                                            name: member.user.name,
+                                            email: member.user.email,
+                                        })),
+                                    }}
+                                />
+                            )}
+                        </div>
                         <p className="text-text-muted">{project.description ?? "Aucune description"}</p>
                     </div>
                 </div>
