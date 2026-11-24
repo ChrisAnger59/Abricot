@@ -179,21 +179,49 @@ export function validatePasswordChange(currentPassword: string, newPassword: str
 }
 
 
+// Project limits, the same as the API's
+export const PROJECT_NAME_MIN_LENGTH = 2;
+export const PROJECT_NAME_MAX_LENGTH = 100;
+export const PROJECT_DESCRIPTION_MAX_LENGTH = 500;
+
 /**
- * Checks the project creation form data.
+ * Checks the fields shared by the creation and the edition of a project: name and description.
+ *
+ * NOTE: the API accepts an empty description, but the mockups mark it with an asterisk:
+ * it is required here, like for the tasks. Messages for the lengths are the API's.
  *
  * @returns An errors object indexed by field name, empty if everything is valid.
  */
-export function validateCreateProject(name: string, description: string, contributors: string[]): Record<string, string> {
+export function validateProjectForm(name: string, description: string): Record<string, string> {
     const errors: Record<string, string> = {};
 
     if (name === "") {
         errors.name = "Le nom du projet est requis";
+    } else if (name.length < PROJECT_NAME_MIN_LENGTH) {
+        errors.name = "Le nom du projet doit contenir au moins 2 caractères";
+    } else if (name.length > PROJECT_NAME_MAX_LENGTH) {
+        errors.name = "Le nom du projet ne peut pas dépasser 100 caractères";
     }
 
     if (description === "") {
         errors.description = "La description du projet est requise";
+    } else if (description.length > PROJECT_DESCRIPTION_MAX_LENGTH) {
+        errors.description = "La description ne peut pas dépasser 500 caractères";
     }
+
+    return errors;
+}
+
+/**
+ * Checks the project creation form data: the shared fields, plus at least one contributor.
+ *
+ * NOTE: the "at least one contributor" rule is stricter than the API's (which accepts a project
+ * without contributor). It is not applied when editing a project: removing everyone is allowed.
+ *
+ * @returns An errors object indexed by field name, empty if everything is valid.
+ */
+export function validateCreateProject(name: string, description: string, contributors: string[]): Record<string, string> {
+    const errors = validateProjectForm(name, description);
 
     if (contributors.length === 0) {
         errors.contributors = "Ajoutez au moins un contributeur";
