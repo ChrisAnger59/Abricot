@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { apiFetch } from "@/lib/api";
+import { getCurrentUser } from "@/lib/user";
 import { getTeamUsers, parseTaskFilters, type SearchParams } from "@/lib/utils";
 import CreateTaskModal from "@/components/Modales/CreateTaskModal";
 import Alert from "@/components/Atoms/Alert";
@@ -44,6 +45,10 @@ export default async function ProjectDetails({ params, searchParams }: ProjectDe
     // Only id and name go to the client components: no need to send e-mails to the browser
     const teamUsers = getTeamUsers(project).map((user) => ({ id: user.id, name: user.name }));
 
+    // Only the name of the signed-in user is needed (avatar of the comment forms). getCurrentUser
+    // returns null when the profile is unavailable: the avatar then shows "?" and the page still works.
+    const currentUser = await getCurrentUser();
+
     return (
         <div className="flex flex-col gap-8">
             <section className="flex flex-wrap items-start justify-between gap-4">
@@ -69,7 +74,12 @@ export default async function ProjectDetails({ params, searchParams }: ProjectDe
 
             {/* An error on the tasks does not prevent displaying the rest of the project */}
             {tasksResult.success ? (
-                <TaskList tasks={tasksResult.data.tasks} users={teamUsers} filters={filters} />
+                <TaskList
+                    tasks={tasksResult.data.tasks}
+                    users={teamUsers}
+                    filters={filters}
+                    currentUserName={currentUser?.name ?? ""}
+                />
             ) : (
                 <Alert>Impossible de récupérer les tâches de ce projet. Réessayez plus tard.</Alert>
             )}

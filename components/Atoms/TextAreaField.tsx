@@ -6,17 +6,20 @@ interface TextAreaFieldProps extends ComponentProps<"textarea"> {
     error?: string;
     // Shows a visible asterisk and sets aria-required (see FormField)
     required?: boolean;
+    // Hides the label visually (it is still read by screen readers): for a field whose
+    // placeholder is the visible text, like the comment field
+    hideLabel?: boolean;
 }
 
 /**
  * Multi-line equivalent of FormField: label, textarea and error message linked together.
  */
-export default function TextAreaField({ id, label, error, required, ...textAreaProps }: TextAreaFieldProps) {
+export default function TextAreaField({ id, label, error, required, hideLabel, ...textAreaProps }: TextAreaFieldProps) {
     const errorId = `${id}-error`;
 
     return (
         <div className="flex flex-col gap-2">
-            <label htmlFor={id} className="text-sm">
+            <label htmlFor={id} className={hideLabel ? "sr-only" : "text-sm"}>
                 {label}
                 {required && <span aria-hidden="true"> *</span>}
             </label>

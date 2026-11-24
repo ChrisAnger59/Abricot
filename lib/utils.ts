@@ -110,6 +110,37 @@ export function toDateInputValue(isoDate: string): string {
 }
 
 
+// Comment dates are displayed in the time zone of Paris, whoever reads them. A fixed zone gives
+// the same text on the server and in the browser (no hydration mismatch) and keeps the date in a
+// server component. Limit: a reader in another time zone sees the time in Paris.
+const COMMENT_DATE_FORMAT = new Intl.DateTimeFormat("fr-FR", {
+    day: "numeric",
+    month: "long",
+    timeZone: "Europe/Paris"
+});
+
+const COMMENT_TIME_FORMAT = new Intl.DateTimeFormat("fr-FR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    // h23: 00:05 and not 24:05 at midnight
+    hourCycle: "h23",
+    timeZone: "Europe/Paris"
+});
+
+/**
+ * Formats the date and time of a comment as on the mockup,
+ * e.g. "2026-03-23T10:20:00.000Z" => "23 mars, 11:20".
+ *
+ * The year is not displayed (as for due dates): the `dateTime` attribute of <time> keeps it.
+ * Two formatters assembled with ", ", because a single one would write "23 mars à 11:20".
+ */
+export function formatCommentDate(isoDate: string): string {
+    const date = new Date(isoDate);
+
+    return `${COMMENT_DATE_FORMAT.format(date)}, ${COMMENT_TIME_FORMAT.format(date)}`;
+}
+
+
 /** The `searchParams` prop of a page: values of the URL query string, as received by Next */
 export type SearchParams = { [key: string]: string | string[] | undefined };
 
