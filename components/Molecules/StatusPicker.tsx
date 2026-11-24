@@ -3,8 +3,10 @@ import { TASK_FORM_STATUSES } from "@/lib/validation";
 import type { TaskStatus } from "@/types/api";
 
 interface StatusPickerProps {
-    // Status checked at first (the form uses "TODO")
+    // Status checked at first ("TODO" for a new task, the current status when editing)
     defaultValue: TaskStatus;
+    // Also offers "Annulée", only for a task that already has this status
+    showCancelled?: boolean;
     // Error message, displayed under the group
     error?: string;
 }
@@ -17,7 +19,11 @@ interface StatusPickerProps {
  *   ring (`has-focus-visible`) and the choice: a thick border AND a check mark, never color alone.
  * - The submitted field is named "status".
  */
-export default function StatusPicker({ defaultValue, error }: StatusPickerProps) {
+export default function StatusPicker({ defaultValue, showCancelled = false, error }: StatusPickerProps) {
+    const statuses: readonly TaskStatus[] = showCancelled
+        ? [...TASK_FORM_STATUSES, "CANCELLED"]
+        : TASK_FORM_STATUSES;
+
     return (
         <fieldset
             aria-describedby={error ? "status-error" : undefined}
@@ -26,7 +32,7 @@ export default function StatusPicker({ defaultValue, error }: StatusPickerProps)
             <legend className="mb-2 text-sm">Statut :</legend>
 
             <div className="flex flex-wrap gap-2">
-                {TASK_FORM_STATUSES.map((status) => (
+                {statuses.map((status) => (
                     <label
                         key={status}
                         className={`flex min-h-11 cursor-pointer items-center gap-2 rounded-full border-2 border-transparent px-4 text-sm has-checked:border-dark has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-dark ${STATUS_STYLES[status].className}`}

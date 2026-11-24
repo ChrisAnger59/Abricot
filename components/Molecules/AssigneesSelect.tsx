@@ -10,6 +10,8 @@ type Assignee = Pick<User, "id" | "name">;
 interface AssigneesSelectProps {
     // People the task can be assigned to (the team of the project)
     users: Assignee[];
+    // Ids checked at first (the current assignees when editing a task)
+    initialSelectedIds?: string[];
     // Error message, displayed under the field
     error?: string;
 }
@@ -23,8 +25,8 @@ interface AssigneesSelectProps {
  * validation error (the form is reset after each submission, see defaultChecked below).
  * Each checked box is submitted as one "assigneeIds" value.
  */
-export default function AssigneesSelect({ users, error }: AssigneesSelectProps) {
-    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+export default function AssigneesSelect({ users, initialSelectedIds = [], error }: AssigneesSelectProps) {
+    const [selectedIds, setSelectedIds] = useState<string[]>(initialSelectedIds);
 
     // New array each time: a React state is never modified in place
     function toggleUser(userId: string) {

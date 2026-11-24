@@ -2,10 +2,12 @@ import CalendarIcon from "@/components/Atoms/CalendarIcon";
 import ListIcon from "@/components/Atoms/ListIcon";
 import TaskCard from "@/components/Molecules/TaskCard";
 import { sortTasksByPriority } from "@/lib/utils";
-import type { Task } from "@/types/api";
+import type { Task, User } from "@/types/api";
 
 interface TaskListProps {
     tasks: Task[];
+    // People a task can be assigned to (the team of the project), passed on to each card
+    users: Pick<User, "id" | "name">[];
 }
 
 /**
@@ -16,7 +18,7 @@ interface TaskListProps {
  * its tab is displayed as in the mockup but disabled.
  * The tabs are not role="tablist": there are no panels to switch between.
  */
-export default function TaskList({ tasks }: TaskListProps) {
+export default function TaskList({ tasks, users }: TaskListProps) {
     const sortedTasks = sortTasksByPriority(tasks);
 
     return (
@@ -53,7 +55,7 @@ export default function TaskList({ tasks }: TaskListProps) {
                 <ul className="flex flex-col gap-4">
                     {sortedTasks.map((task) => (
                         <li key={task.id}>
-                            <TaskCard task={task} />
+                            <TaskCard task={task} users={users} />
                         </li>
                     ))}
                 </ul>

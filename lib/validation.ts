@@ -24,9 +24,13 @@ const TASK_DESCRIPTION_MAX_LENGTH = 1000;
 
 /**
  * Statuses the user can choose in the task form, in display order.
- * CANCELLED exists in the API but is not on the mockups.
+ * CANCELLED exists in the API but is not on the mockups: the form only offers it
+ * for a task that already has it (see StatusPicker).
  */
 export const TASK_FORM_STATUSES = ["TODO", "IN_PROGRESS", "DONE"] as const;
+
+/** Every status the API accepts: the form statuses plus CANCELLED */
+const VALID_TASK_STATUSES: readonly string[] = [...TASK_FORM_STATUSES, "CANCELLED"];
 
 /** Date sent by an <input type="date">: always YYYY-MM-DD, whatever the displayed format */
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
@@ -184,16 +188,17 @@ export function validateCreateProject(name: string, description: string, contrib
 
 
 /**
- * Checks the task creation form data.
+ * Checks the task form data, for both the creation and the edition of a task.
  *
  * NOTE: the API only requires the title; the description and the due date are required here
- * because the mockup marks them with an asterisk. Messages for the title, the description
+ * because the creation mockup marks them with an asterisk, and the edit form follows the same
+ * rules so that a task never loses them. Messages for the title, the description
  * length and the date format are the API's.
  *
  * @param status - Value of the status radio group (the form always submits one)
  * @returns An errors object indexed by field name, empty if everything is valid.
  */
-export function validateCreateTask(title: string, description: string, dueDate: string, status: string): Record<string, string> {
+export function validateTaskForm(title: string, description: string, dueDate: string, status: string): Record<string, string> {
     const errors: Record<string, string> = {};
 
     if (title === "") {
@@ -217,7 +222,7 @@ export function validateCreateTask(title: string, description: string, dueDate: 
     }
 
     // Cannot happen with the form (radio buttons), but the action can be called with any data
-    if (!(TASK_FORM_STATUSES as readonly string[]).includes(status)) {
+    if (!VALID_TASK_STATUSES.includes(status)) {
         errors.status = "Statut invalide";
     }
 
