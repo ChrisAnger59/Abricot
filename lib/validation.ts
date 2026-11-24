@@ -203,6 +203,28 @@ export function validateCreateProject(name: string, description: string, contrib
 }
 
 
+/** Longest comment the API accepts (the comment field is also limited to it with maxLength) */
+export const COMMENT_MAX_LENGTH = 2000;
+
+/**
+ * Checks a comment, with the messages of the API.
+ *
+ * @param content - The comment, already trimmed
+ * @returns An errors object indexed by field name ("content"), empty if everything is valid.
+ */
+export function validateComment(content: string): Record<string, string> {
+    const errors: Record<string, string> = {};
+
+    if (content === "") {
+        errors.content = "Le contenu du commentaire est requis";
+    } else if (content.length > COMMENT_MAX_LENGTH) {
+        errors.content = "Le contenu du commentaire ne peut pas dépasser 2000 caractères";
+    }
+
+    return errors;
+}
+
+
 /**
  * Checks the task form data, for both the creation and the edition of a task.
  *

@@ -12,6 +12,8 @@ interface TaskListProps {
     users: Pick<User, "id" | "name">[];
     // Filters read from the URL by the page (search text and status)
     filters: TaskFiltersValues;
+    // Name of the signed-in user, passed on to each card for the avatar of the comment form
+    currentUserName: string;
 }
 
 /**
@@ -26,7 +28,7 @@ interface TaskListProps {
  * its tab is displayed as in the mockup but disabled.
  * The tabs are not role="tablist": there are no panels to switch between.
  */
-export default function TaskList({ tasks, users, filters }: TaskListProps) {
+export default function TaskList({ tasks, users, filters, currentUserName }: TaskListProps) {
     const visibleTasks = sortTasksByPriority(filterTasks(tasks, filters));
     const hasActiveFilters = filters.query !== "" || filters.status !== null;
 
@@ -84,7 +86,7 @@ export default function TaskList({ tasks, users, filters }: TaskListProps) {
                 <ul className="flex flex-col gap-4">
                     {visibleTasks.map((task) => (
                         <li key={task.id}>
-                            <TaskCard task={task} users={users} />
+                            <TaskCard task={task} users={users} currentUserName={currentUserName} />
                         </li>
                     ))}
                 </ul>

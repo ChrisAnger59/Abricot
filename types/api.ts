@@ -197,16 +197,29 @@ export interface Task {
 }
 
 /**
- * Task comment.
- * NOTE: built from the documentation (api-docs); no real comment observed yet,
- * to be confirmed with a real call in the comments feature.
+ * Task comment, as returned inside the tasks of GET /projects/{id}/tasks
+ * (checked with real calls). They come from the oldest to the most recent.
+ *
+ * NOTE: unlike the Swagger and unlike the response of POST .../comments, there is no `taskId`
+ * and no `authorId` here: the author is only available through `author`.
  */
 export interface TaskComment {
     id: string;
     content: string;
-    taskId: string;
-    authorId: string;
     author: User;
     createdAt: string;
     updatedAt: string;
+}
+
+/**
+ * Content of data for POST /projects/{id}/tasks/{taskId}/comments.
+ * Richer than TaskComment (it also has taskId, authorId and the task), but the front only
+ * needs to know that the comment was created: the list is read again with the tasks.
+ */
+export interface CommentData {
+    comment: TaskComment & {
+        taskId: string;
+        authorId: string;
+        task: { id: string; title: string };
+    };
 }
