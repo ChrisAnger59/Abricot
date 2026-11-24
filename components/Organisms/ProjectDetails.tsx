@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { apiFetch } from "@/lib/api";
-import { getTeamUsers } from "@/lib/utils";
+import { getTeamUsers, parseTaskFilters, type SearchParams } from "@/lib/utils";
 import CreateTaskModal from "@/components/Modales/CreateTaskModal";
 import Alert from "@/components/Atoms/Alert";
 import ArrowLeftIcon from "@/components/Atoms/ArrowLeftIcon";
@@ -11,16 +11,20 @@ import type { ProjectData, TasksData } from "@/types/api";
 
 interface ProjectDetailsProps {
     params: Promise<{ id: string }>;
+    // Query string of the URL (?query=...&status=...), a promise like `params`
+    searchParams: Promise<SearchParams>;
 }
 
 /**
  * Content of the project page: header, contributors and tasks.
  *
- * Awaits `params` itself: the page passes it down without awaiting it,
+ * Awaits `params` and `searchParams` itself: the page passes them down without awaiting them,
  * so this component is covered by the loading.tsx boundary.
  */
-export default async function ProjectDetails({ params }: ProjectDetailsProps) {
+export default async function ProjectDetails({ params, searchParams }: ProjectDetailsProps) {
     const { id } = await params;
+    // The filters of the task list; invalid values in the URL simply mean "no filter"
+    const filters = parseTaskFilters(await searchParams);
     const result = await apiFetch<ProjectData>(`/projects/${id}`);
 
     if (!result.success) {
@@ -65,7 +69,7 @@ export default async function ProjectDetails({ params }: ProjectDetailsProps) {
 
             {/* An error on the tasks does not prevent displaying the rest of the project */}
             {tasksResult.success ? (
-                <TaskList tasks={tasksResult.data.tasks} users={teamUsers} />
+                <TaskList tasks={tasksResult.data.tasks} users={teamUsers} filters={filters} />
             ) : (
                 <Alert>Impossible de récupérer les tâches de ce projet. Réessayez plus tard.</Alert>
             )}

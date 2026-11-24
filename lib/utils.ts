@@ -1,4 +1,5 @@
-import type { Project, ProjectMember, Task, TaskPriority, User } from "@/types/api";
+import { isTaskStatus, MAX_SEARCH_LENGTH, MIN_SEARCH_LENGTH } from "@/lib/validation";
+import type { Project, ProjectMember, Task, TaskPriority, TaskStatus, User } from "@/types/api";
 
 /**
  * Computes the initials shown in an avatar.
@@ -106,4 +107,74 @@ export function formatDueDate(isoDate: string): string {
  */
 export function toDateInputValue(isoDate: string): string {
     return isoDate.slice(0, 10);
+}
+
+
+/** The `searchParams` prop of a page: values of the URL query string, as received by Next */
+export type SearchParams = { [key: string]: string | string[] | undefined };
+
+/** Filters applied to the tasks of a project, read from the URL */
+export interface TaskFilters {
+    // Text searched in the titles; "" means no search
+    query: string;
+    // Status to keep; null means every status
+    status: TaskStatus | null;
+}
+
+
+/**
+ * Reads the filters of the task list from the URL parameters (?query=...&status=...).
+ *
+ * The URL can be edited by hand, so nothing is trusted:
+ * - a parameter given twice (?query=a&query=b) arrives as an array: only the first value is kept;
+ * - the search text is trimmed and cut to MAX_SEARCH_LENGTH characters;
+ * - below MIN_SEARCH_LENGTH characters, the search is ignored (same rule as the search field);
+ * - a status that is not one of the task statuses is ignored.
+ * Invalid values never raise an error: they just mean "no filter".
+ *
+ * The values are only used to compare texts, never to build HTML.
+ */
+export function parseTaskFilters(searchParams: SearchParams): TaskFilters {
+    const rawQuery = getFirstValue(searchParams.query).trim().slice(0, MAX_SEARCH_LENGTH);
+    const rawStatus = getFirstValue(searchParams.status);
+
+    return {
+        query: rawQuery.length >= MIN_SEARCH_LENGTH ? rawQuery : "",
+        status: isTaskStatus(rawStatus) ? rawStatus : null,
+    };
+}
+
+/** First value of a URL parameter, or "" if it is missing */
+function getFirstValue(value: string | string[] | undefined): string {
+    return Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
+}
+
+
+/**
+ * Prepares a text for a comparison that ignores case and accents:
+ * "Tâche" and "tache" give the same result.
+ *
+ * `normalize("NFD")` splits an accented letter into the letter and its accent ("é" => "e" + "´"),
+ * then the regular expression removes the accents (the "combining diacritical marks" range).
+ */
+export function normalizeText(text: string): string {
+    return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
+
+/**
+ * Keeps the tasks that match the filters: the status (if any) AND the search text (if any)
+ * in the title. The search is the whole phrase typed by the user, not each word separately.
+ *
+ * `filter` builds a new array and leaves the original untouched.
+ */
+export function filterTasks(tasks: Task[], filters: TaskFilters): Task[] {
+    const searchedText = normalizeText(filters.query);
+
+    return tasks.filter((task) => {
+        const matchesStatus = filters.status === null || task.status === filters.status;
+        const matchesQuery = searchedText === "" || normalizeText(task.title).includes(searchedText);
+
+        return matchesStatus && matchesQuery;
+    });
 }

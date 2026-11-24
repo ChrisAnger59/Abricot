@@ -10,6 +10,8 @@
  * In a "use server" file, only async Server Actions can be exported.
  */
 
+import type { TaskStatus } from "@/types/api";
+
 // API message for any password rule that is not met
 const PASSWORD_RULES_MESSAGE = "Le mot de passe doit contenir au moins 8 caractères, une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial (@$!%*?&)"
 
@@ -34,6 +36,20 @@ const VALID_TASK_STATUSES: readonly string[] = [...TASK_FORM_STATUSES, "CANCELLE
 
 /** Date sent by an <input type="date">: always YYYY-MM-DD, whatever the displayed format */
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
+/** Minimal number of characters before any search or filtering starts (client and server) */
+export const MIN_SEARCH_LENGTH = 3;
+
+/** A search text longer than this is cut: nobody types more, and the URL stays reasonable */
+export const MAX_SEARCH_LENGTH = 100;
+
+/**
+ * Type guard: tells TypeScript that a text is one of the task statuses.
+ * Used for values that come from the URL, which anybody can edit by hand.
+ */
+export function isTaskStatus(value: string): value is TaskStatus {
+    return VALID_TASK_STATUSES.includes(value);
+}
 
 
 /**

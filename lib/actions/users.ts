@@ -2,6 +2,7 @@
 
 import { apiFetch } from "@/lib/api";
 import { getCurrentUser } from "@/lib/user";
+import { MIN_SEARCH_LENGTH } from "@/lib/validation";
 import type { User, UsersData } from "@/types/api";
 
 // Result from searching users
@@ -10,9 +11,6 @@ interface SearchUsersResult {
     // Only if search has failed
     error?: string;
 }
-
-// Minimal number of characters before any search
-const MIN_SEARCH_LENGTH = 3;
 
 /**
  * Users search by email or name
