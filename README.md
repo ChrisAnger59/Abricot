@@ -63,7 +63,8 @@ Main choices:
 - Task comments: a native `<details>` on each card unfolds the comments (author, date, text) and a form to add one; the text is always displayed as plain text, never as HTML
 - Project edition in a modal (title, description, contributors), only for the administrators of the project; the team changes are computed on the server from the current members
 - Real project progress on the project cards (tasks done out of tasks, cancelled ones left out), computed on the server with one API call per project
-- Dashboard (list view): the tasks assigned to the signed-in user, sorted by priority (cancelled ones last), with the same URL-based search and status filter as the project page; the Kanban tab is displayed but disabled for now
+- Dashboard (list view): the tasks assigned to the signed-in user, sorted by priority (cancelled ones last), with the same URL-based search and status filter as the project page
+- Dashboard (Kanban view, `?view=kanban`): the assigned tasks due this month in three columns (to do, in progress, done) with their count; cancelled and undated tasks are left out
 - Generic `Modal` component built on the native `<dialog>` element (used for projects and tasks)
 - Shared confirmation message (`FlashMessageProvider`): centered, dismissible and self-closing, announced to screen readers
 
