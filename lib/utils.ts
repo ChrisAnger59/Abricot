@@ -205,6 +205,60 @@ function getFirstValue(value: string | string[] | undefined): string {
 }
 
 
+/** Views of the dashboard: the list of assigned tasks, or the Kanban board of the month */
+export type DashboardView = "list" | "kanban";
+
+/**
+ * Reads the view of the dashboard from the URL (?view=kanban).
+ * Anything else (missing, misspelled, given twice) means the list: the URL can be edited by hand,
+ * so an invalid value never raises an error.
+ */
+export function parseDashboardView(searchParams: SearchParams): DashboardView {
+    return getFirstValue(searchParams.view) === "kanban" ? "kanban" : "list";
+}
+
+
+/**
+ * Current month as a "YYYY-MM" text, e.g. "2026-11" (like `date("Y-m")` in PHP).
+ *
+ * Computed in the time zone of Paris, whatever the server's: at 1 a.m. on the 1st in Paris, a
+ * server in UTC is still on the last day of the previous month. `formatToParts` gives the year and
+ * the month as separate pieces, so there is no text to cut.
+ */
+export function getCurrentMonth(now: Date = new Date()): string {
+    const parts = new Intl.DateTimeFormat("fr-FR", {
+        year: "numeric",
+        month: "2-digit",
+        timeZone: "Europe/Paris",
+    }).formatToParts(now);
+
+    const year = parts.find((part) => part.type === "year")?.value ?? "";
+    const month = parts.find((part) => part.type === "month")?.value ?? "";
+
+    return `${year}-${month}`;
+}
+
+/**
+ * Tells whether an ISO date falls in a month ("YYYY-MM").
+ *
+ * The first 7 characters of an ISO date ("2026-11-15T00:00:00.000Z") are already its "YYYY-MM":
+ * two texts are compared, with no Date arithmetic and no time zone shift (the API stores due
+ * dates at midnight UTC). A task without a date is in no month.
+ */
+export function isInMonth(isoDate: string | null, month: string): boolean {
+    return isoDate !== null && isoDate.slice(0, 7) === month;
+}
+
+/** Month as a readable text, e.g. "2026-11" => "novembre 2026" */
+export function getMonthLabel(month: string): string {
+    return new Intl.DateTimeFormat("fr-FR", {
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC",
+    }).format(new Date(`${month}-01T00:00:00Z`));
+}
+
+
 /**
  * Prepares a text for a comparison that ignores case and accents:
  * "Tâche" and "tache" give the same result.

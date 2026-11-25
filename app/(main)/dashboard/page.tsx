@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import CreateProjectModal from "@/components/Modales/CreateProjectModal";
 import DashboardGreeting from "@/components/Molecules/DashboardGreeting";
-import ViewTabs from "@/components/Molecules/ViewTabs";
 import DashboardContent from "@/components/Organisms/DashboardContent";
 import type { SearchParams } from "@/lib/utils";
 
@@ -11,7 +10,8 @@ interface DashboardPageProps {
 }
 
 /**
- * Dashboard: welcome sentence, creation of a project, view tabs and the tasks assigned to the user.
+ * Dashboard: welcome sentence, creation of a project, then the view tabs and the tasks assigned
+ * to the user (list or Kanban board, see DashboardContent).
  */
 function DashboardPage({ searchParams }: DashboardPageProps) {
     return (
@@ -25,8 +25,6 @@ function DashboardPage({ searchParams }: DashboardPageProps) {
                 </div>
                 <CreateProjectModal />
             </div>
-
-            <ViewTabs />
 
             <Suspense fallback={<p>Chargement...</p>}>
                 <DashboardContent searchParams={searchParams} />
