@@ -191,6 +191,26 @@ export interface TaskSummary {
     creator: User;
 }
 
+/**
+ * Task assigned to the signed-in user, as returned by GET /dashboard/assigned-tasks
+ * (checked with a real call). Same as Task, except for two fields:
+ * - no `creator` (the route does not include it);
+ * - `project` also has the description of the project.
+ * `Omit<Task, ...>` takes every field of Task except the ones listed.
+ */
+export interface AssignedTask extends Omit<Task, "creator" | "project"> {
+    project: {
+        id: string;
+        name: string;
+        description: string | null;
+    };
+}
+
+/** Content of data for GET /dashboard/assigned-tasks */
+export interface AssignedTasksData {
+    tasks: AssignedTask[];
+}
+
 /** Project with all its (simplified) tasks, as returned by GET /projects/{id} */
 export interface ProjectWithTasksData {
     project: Project & { tasks: TaskSummary[] };

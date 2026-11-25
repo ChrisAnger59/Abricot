@@ -82,9 +82,27 @@ const PRIORITY_RANK: Record<TaskPriority, number> = {
  *
  * Works on a copy ([...tasks]) because `sort` modifies the array it is called on.
  * `sort` is stable: tasks with the same priority keep the API order (most recent first).
+ *
+ * Generic (`T extends ...`): works on any task shape that has a priority (full tasks of a project,
+ * tasks assigned to the user on the dashboard) and returns the same shape.
  */
-export function sortTasksByPriority(tasks: Task[]): Task[] {
+export function sortTasksByPriority<T extends Pick<Task, "priority">>(tasks: T[]): T[] {
     return [...tasks].sort((a, b) => PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority]);
+}
+
+
+/**
+ * Moves the cancelled tasks to the end of the list, keeping the order inside each group.
+ * Used on the dashboard: a cancelled task is no longer something to do, so it must not
+ * come before the tasks that are still waiting for the user.
+ *
+ * `filter` is called twice (kept tasks, then cancelled ones), and `...` spreads both in one new array.
+ */
+export function moveCancelledTasksLast<T extends Pick<Task, "status">>(tasks: T[]): T[] {
+    return [
+        ...tasks.filter((task) => task.status !== "CANCELLED"),
+        ...tasks.filter((task) => task.status === "CANCELLED"),
+    ];
 }
 
 
@@ -205,7 +223,7 @@ export function normalizeText(text: string): string {
  *
  * `filter` builds a new array and leaves the original untouched.
  */
-export function filterTasks(tasks: Task[], filters: TaskFilters): Task[] {
+export function filterTasks<T extends Pick<Task, "title" | "status">>(tasks: T[], filters: TaskFilters): T[] {
     const searchedText = normalizeText(filters.query);
 
     return tasks.filter((task) => {
