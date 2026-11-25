@@ -1,6 +1,12 @@
 import { isTaskStatus, MAX_SEARCH_LENGTH, MIN_SEARCH_LENGTH } from "@/lib/validation";
 import type { Project, ProjectMember, Task, TaskPriority, TaskStatus, User } from "@/types/api";
 
+/** Progress of a project: tasks done out of the tasks that can still be done */
+export interface Progress {
+    done: number;
+    total: number;
+}
+
 /**
  * Computes the initials shown in an avatar.
  *
@@ -208,4 +214,35 @@ export function filterTasks(tasks: Task[], filters: TaskFilters): Task[] {
 
         return matchesStatus && matchesQuery;
     });
+}
+
+
+/**
+ * Computes the progress of a project from its tasks.
+ *
+ * CANCELLED tasks are left out of the total: a cancelled task will never be done, so counting it
+ * would stop a project from ever reaching 100 %. "X/Y tasks done" then means Y tasks that were
+ * to do, in progress or done.
+ *
+ * `filter` keeps the matching tasks, and `length` counts them.
+ */
+export function getProgress(tasks: Pick<Task, "status">[]): Progress {
+    const countedTasks = tasks.filter((task) => task.status !== "CANCELLED");
+
+    return {
+        done: countedTasks.filter((task) => task.status === "DONE").length,
+        total: countedTasks.length,
+    };
+}
+
+
+/**
+ * Converts a progress to a percentage for display, from 0 to 100.
+ *
+ * Rounded DOWN (`Math.floor`): with `Math.round`, 199 tasks done out of 200 would display 100 %
+ * while the project is not finished. 100 % only appears when everything is done.
+ * A project without tasks is at 0 % (and 0 / 0 would give NaN).
+ */
+export function getProgressPercent({ done, total }: Progress): number {
+    return total === 0 ? 0 : Math.floor((done / total) * 100);
 }

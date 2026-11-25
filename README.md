@@ -62,6 +62,7 @@ Main choices:
 - Task search (by title) and status filter on the project page: the filters live in the URL (`?query=...&status=...`), the server filters the list, the search waits 300 ms and 3 characters
 - Task comments: a native `<details>` on each card unfolds the comments (author, date, text) and a form to add one; the text is always displayed as plain text, never as HTML
 - Project edition in a modal (title, description, contributors), only for the administrators of the project; the team changes are computed on the server from the current members
+- Real project progress on the project cards (tasks done out of tasks, cancelled ones left out), computed on the server with one API call per project
 - Generic `Modal` component built on the native `<dialog>` element (used for projects and tasks)
 - Shared confirmation message (`FlashMessageProvider`): centered, dismissible and self-closing, announced to screen readers
 

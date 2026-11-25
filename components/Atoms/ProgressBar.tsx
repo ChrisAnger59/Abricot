@@ -1,17 +1,27 @@
+import { getProgressPercent } from "@/lib/utils";
+
 interface ProgressBarProps {
     // Number of tasks done
     done: number;
-    // Number of tasks
+    // Number of tasks that can be done (cancelled ones are not counted)
     total: number;
+    // Accessible name of the bar: each bar of a page must say which project it is about
+    label: string;
 }
 
 /**
- * Progress Bar
- *  
+ * Progress bar of a project: percentage, bar and "X/Y tâches terminées".
+ *
+ * The information is never carried by the bar alone: the percentage and the count are written.
+ * For screen readers, the bar has its own name (`label`), its value (aria-valuenow) and a
+ * sentence (aria-valuetext) that is read instead of the bare number.
  */
-export default function ProgressBar({ done, total }: ProgressBarProps) {
-    // A taskless project will be 0 / 0 = NaN, 0% in that case
-    const percent = total === 0 ? 0 : Math.round((done / total) * 100);
+export default function ProgressBar({ done, total, label }: ProgressBarProps) {
+    const percent = getProgressPercent({ done, total });
+
+    const valueText = total === 0
+        ? "Aucune tâche"
+        : `${done} ${done > 1 ? "tâches terminées" : "tâche terminée"} sur ${total}`;
 
     return (
         <div className="flex flex-col gap-2">
@@ -22,10 +32,11 @@ export default function ProgressBar({ done, total }: ProgressBarProps) {
 
             <div
                 role="progressbar"
-                aria-label="Progression du projet"
+                aria-label={label}
                 aria-valuenow={percent}
                 aria-valuemin={0}
                 aria-valuemax={100}
+                aria-valuetext={valueText}
                 className="h-2 w-full rounded-full bg-tag"
             >
                 <div
@@ -35,7 +46,9 @@ export default function ProgressBar({ done, total }: ProgressBarProps) {
             </div>
 
             <p className="text-xs text-text-muted">
-                {done}/{total} {total > 1 ? "tâches terminées" : "tâche terminée"}
+                {total === 0
+                    ? "Aucune tâche"
+                    : `${done}/${total} ${total > 1 ? "tâches terminées" : "tâche terminée"}`}
             </p>
         </div>
     )

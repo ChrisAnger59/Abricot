@@ -3,27 +3,29 @@ import type { Project } from "@/types/api";
 import Avatar from '@/components/Atoms/Avatar';
 import ProgressBar from "@/components/Atoms/ProgressBar";
 import UserTag from "@/components/Molecules/UserTag";
-import { getOtherMembers } from "@/lib/utils";
+import { getOtherMembers, type Progress } from "@/lib/utils";
 
 interface ProjectCardProps {
     project: Project;
+    // Tasks done out of the tasks of the project, or null if it could not be read
+    progress: Progress | null;
 }
 
 
 /**
- * Carte d'un projet dans la liste : nom, description, nombre de tâches et équipe.
+ * Card of a project in the list: name, description, progress and team.
  *
- * NOTE : l'API ne fournit que le nombre total de tâches (_count.tasks),
- * pas le nombre de tâches terminées : la progression de la maquette n'est pas affichable.
+ * NOTE: GET /projects only gives the total number of tasks (_count.tasks), not how many are done:
+ * the progress is computed by the parent from GET /projects/{id} (see getProjectProgress).
+ * When it could not be read, the card says so instead of showing a wrong 0 %.
  */
-export default function ProjectCard({ project }: ProjectCardProps) {
+export default function ProjectCard({ project, progress }: ProjectCardProps) {
 
-    // Le propriétaire peut aussi figurer dans members (s'il s'est ajouté comme contributeur) :
-    // on l'exclut pour ne pas le compter deux fois
+    // The owner may also appear in members (if added as a contributor):
+    // excluded here so that they are not counted twice
     const otherMembers = getOtherMembers(project);
 
     const teamSize = 1 + otherMembers.length;
-    const taskCount = project._count.tasks;
 
     return (
         <article className="flex h-full flex-col gap-6 rounded-card border border-border bg-surface p-6">
@@ -38,7 +40,15 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 </p>
             </div>
 
-            <ProgressBar done={0} total={taskCount} />
+            {progress ? (
+                <ProgressBar
+                    done={progress.done}
+                    total={progress.total}
+                    label={`Progression du projet ${project.name}`}
+                />
+            ) : (
+                <p className="text-sm text-text-muted">Progression indisponible</p>
+            )}
 
             <div className="mt-auto flex flex-col gap-2">
                 <p className="text-xs text-text-muted">Équipe ({teamSize})</p>

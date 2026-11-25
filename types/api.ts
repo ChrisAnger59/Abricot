@@ -173,6 +173,30 @@ export interface TaskData {
 }
 
 /**
+ * Simplified task, as returned inside `project.tasks` by GET /projects/{id} (checked with real
+ * calls): no assignees, no comments, no `project`. It has every task of the project and its status,
+ * which is all the progress of a project needs.
+ */
+export interface TaskSummary {
+    id: string;
+    title: string;
+    description: string | null;
+    status: TaskStatus;
+    priority: TaskPriority;
+    dueDate: string | null;
+    createdAt: string;
+    updatedAt: string;
+    projectId: string;
+    creatorId: string;
+    creator: User;
+}
+
+/** Project with all its (simplified) tasks, as returned by GET /projects/{id} */
+export interface ProjectWithTasksData {
+    project: Project & { tasks: TaskSummary[] };
+}
+
+/**
  * Full task, as returned by GET /projects/{id}/tasks.
  * NOTE: dueDate is an ISO date at midnight UTC (e.g. "2026-12-08T00:00:00.000Z").
  */
